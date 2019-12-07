@@ -38,8 +38,6 @@ import com.univocity.parsers.tsv.TsvWriterSettings;
  * and write the dataset to TSV file
  */
 public class DataHandler {
-	
-	
 
 	/**
 	 * write a dataset to TSV file
@@ -108,5 +106,15 @@ public class DataHandler {
 	
 	}
 	
+
+	/**
+	 *  Print the number of columns and rows of the specified dataset to the console
+	 * @param dataset
+	 */
+	public static void printDatasetStats(List<String[]> dataset) {
+		
+		System.out.println("Number of rows: " + dataset.size());
+		System.out.println("Number of columns: " + dataset.get(0).length);
+	}
 
 }
