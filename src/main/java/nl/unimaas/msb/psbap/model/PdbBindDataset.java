@@ -33,18 +33,28 @@ public class PdbBindDataset {
 	
 	private List<String[]> pdbbindData = new ArrayList<String[]>();
 	
+	/**
+	 * No-argument constructor initializes instance variables
+	 */
 	private PdbBindDataset() {
 		this.pathGeneralFile = Config.getProperty("PDBBIND_DATA_PATH_1");
 		this.pathGeneralNamesFile = Config.getProperty("PDBBIND_DATA_PATH_2");
 		this.entriesPath = Config.getProperty("PDBBIND_ENTRIES_PATH");
 	}
-	
-	
+
+	/**
+	 * PdbBindDataset Constructor
+	 * 
+	 * @param pathGeneralFile from the PdbBind downloaded file provides (PDB, Ligand, resolution) information 
+	 * @param pathGeneralNamesFile from the PdbBind downloaded file provides Uniprot IDs
+	 * @param entriesPath path of the PdbBind entries folders as extracted from the dataset downloaded file
+	 */
 	private PdbBindDataset(String pathGeneralFile, String pathGeneralNamesFile, String entriesPath) {
 	    this.pathGeneralFile = pathGeneralFile;
 	    this.pathGeneralNamesFile = pathGeneralNamesFile;
 	    this.entriesPath = entriesPath;
 	}
+	
 	
 	
 
