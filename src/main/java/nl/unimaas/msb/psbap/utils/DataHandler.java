@@ -1,5 +1,5 @@
 /**
-* binding Pocket's SNPS effect on Binding Affinity Project (PSBAP) 
+* binding Pocket's SNPs effect on Binding Affinity Project (PSBAP) 
 * 
 *Copyright (C) 2019  Ammar Ammar <ammar257ammar@gmail.com>
 *
@@ -20,6 +20,15 @@
 
 package nl.unimaas.msb.psbap.utils;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.List;
+
+import com.univocity.parsers.tsv.TsvWriter;
+import com.univocity.parsers.tsv.TsvWriterSettings;
+
 /**
  * 
  * @author Ammar Ammar
@@ -29,5 +38,46 @@ package nl.unimaas.msb.psbap.utils;
  * and write the dataset to TSV file
  */
 public class DataHandler {
+	
+	
+
+	/**
+	 * write a dataset to TSV file
+	 * @param dataset to be written to the filesystem
+	 * @param path of the file to write the dataset to it
+	 * @param header row for the dataset
+	 */
+	public static void writeDatasetToTSV(List<String[]> dataset, String path, String[] header){
+		
+		Writer outputWriter;
+		
+		try {
+			
+			outputWriter = new FileWriter(new File(path));
+
+			TsvWriter writer = new TsvWriter(outputWriter, new TsvWriterSettings());
+		
+			if(header != null){
+				writer.writeHeaders(header);
+			}
+			
+			writer.writeStringRowsAndClose(dataset);
+		
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	/**
+	 * Overload writeDatasetToTSV(dataset, path, header) to write datasets without header
+	 * @param dataset to be written to the filesystem
+	 * @param path of the file to write the dataset to it
+	 */
+	public static void writeDatasetToTSV(List<String[]> dataset, String path){
+		writeDatasetToTSV(dataset, path, null);
+	}
+	
+	
 
 }
