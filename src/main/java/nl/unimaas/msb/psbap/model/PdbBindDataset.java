@@ -1,5 +1,5 @@
 /**
-* binding Pocket's SNPS effect on Binding Affinity Project (PSBAP) 
+* binding Pocket's SNPs effect on Binding Affinity Project (PSBAP) 
 * 
 *Copyright (C) 2019  Ammar Ammar <ammar257ammar@gmail.com>
 *
@@ -149,6 +149,17 @@ public class PdbBindDataset {
 		}
 			
 		return this;
+	}
+	
+	
+	/**
+	 *  get the data of the PdbBindDataset object as List<String[]> dataset
+	 * @return
+	 */
+	public List<String[]> getData(){
+		
+		return this.pdbbindData;
+		
 	}
 	
 
