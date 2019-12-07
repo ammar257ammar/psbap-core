@@ -28,6 +28,8 @@ import junit.framework.TestCase;
  */
 public class ConfigTest extends TestCase {
 	
-	
 
+	public void testConfig(){
+        assertTrue( true );
+	}
 }
