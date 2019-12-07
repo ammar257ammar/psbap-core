@@ -23,6 +23,7 @@ package nl.unimaas.msb.psbap.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import nl.unimaas.msb.psbap.model.PdbBindDataset;
 import nl.unimaas.msb.psbap.Config;
 
 public class PdbBindDataset {
@@ -55,7 +56,24 @@ public class PdbBindDataset {
 	    this.entriesPath = entriesPath;
 	}
 	
+	/**
+	 * Create a new PdbBindDataset instance
+	 * @return a new PdbBindDataset with initialized variables
+	 */
+	public static PdbBindDataset create() {
+	    return new PdbBindDataset();
+	}
 	
+	/**
+	 * Create a new PdbBindDataset instance with arguments provided
+	 * @param pathGeneralFile from the PdbBind downloaded file provides (PDB, Ligand, resolution) information 
+	 * @param pathGeneralNamesFile from the PdbBind downloaded file provides Uniprot IDs
+	 * @param entriesPath path of the PdbBind entries folders as extracted from the dataset downloaded file
+	 * @return a new PdbBindDataset
+	 */
+	public static PdbBindDataset create(String pathGeneralFile, String pathGeneralNamesFile, String entriesPath) {
+	    return new PdbBindDataset(pathGeneralFile, pathGeneralNamesFile, entriesPath);
+	}
 	
 
 }
