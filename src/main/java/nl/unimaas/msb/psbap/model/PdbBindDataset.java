@@ -20,7 +20,31 @@
 
 package nl.unimaas.msb.psbap.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import nl.unimaas.msb.psbap.Config;
+
 public class PdbBindDataset {
+	
+	private String pathGeneralFile;
+	private String pathGeneralNamesFile;
+	private String entriesPath;
+	
+	private List<String[]> pdbbindData = new ArrayList<String[]>();
+	
+	private PdbBindDataset() {
+		this.pathGeneralFile = Config.getProperty("PDBBIND_DATA_PATH_1");
+		this.pathGeneralNamesFile = Config.getProperty("PDBBIND_DATA_PATH_2");
+		this.entriesPath = Config.getProperty("PDBBIND_ENTRIES_PATH");
+	}
+	
+	
+	private PdbBindDataset(String pathGeneralFile, String pathGeneralNamesFile, String entriesPath) {
+	    this.pathGeneralFile = pathGeneralFile;
+	    this.pathGeneralNamesFile = pathGeneralNamesFile;
+	    this.entriesPath = entriesPath;
+	}
 	
 	
 
