@@ -78,6 +78,35 @@ public class DataHandler {
 		writeDatasetToTSV(dataset, path, null);
 	}
 	
+	/**
+	 * Print the first N rows of the specified dataset to console (to examine the dataset)
+	 * @param dataset
+	 * @param num number of rows to be printed
+	 */
+	public static void printDatasetHead(List<String[]> dataset, int num) {
+		
+		for(int i=0; i<num; i++) {
+			
+			String[] row = dataset.get(i);
+			
+			for(int j=0; j<row.length; j++) {
+				System.out.print(row[j]+"\t");
+			}
+			System.out.println();
+		}
+	}
+	
+
+	/**
+	 * Overload the method printDatasetHead(dataset, num) to print always the first 10 rows to console
+	 * @see printDatasetHead(List<String[]>, int) 
+	 * @param dataset
+	 */
+	public static void printDatasetHead(List<String[]> dataset) {
+		
+		printDatasetHead(dataset, 10);
+	
+	}
 	
 
 }
