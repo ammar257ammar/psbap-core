@@ -20,6 +20,11 @@
 
 package nl.unimaas.msb.psbap;
 
+import java.util.List;
+
+import nl.unimaas.msb.psbap.model.PdbBindDataset;
+import nl.unimaas.msb.psbap.utils.DataHandler;
+
 /**
  * Hello world!
  *
@@ -28,6 +33,16 @@ public class PSBAP
 {
     public static void main( String[] args )
     {
-        System.out.println( "" );
+
+    	CliOptions cli = new CliOptions(args);
+    	
+    	switch(cli.operation){
+    	
+    	case "print-pdbbind-head":
+    		List<String[]> dataset = PdbBindDataset.create().loadData().getData();
+			DataHandler.printDatasetHead(dataset);
+    	}
+    	
+    	
     }
 }
