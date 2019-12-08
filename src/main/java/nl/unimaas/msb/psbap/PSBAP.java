@@ -22,6 +22,7 @@ package nl.unimaas.msb.psbap;
 
 import java.util.List;
 
+import nl.unimaas.msb.psbap.model.PdbBindDataset.PdbbindAttribute;
 import nl.unimaas.msb.psbap.model.PdbBindDataset;
 import nl.unimaas.msb.psbap.utils.DataHandler;
 
@@ -41,6 +42,16 @@ public class PSBAP
     	case "print-pdbbind-head":
     		List<String[]> dataset = PdbBindDataset.create().loadData().getData();
 			DataHandler.printDatasetHead(dataset);
+			break;
+    	case "print-filtered-sorted":
+    		List<String[]> datasetFiltered = PdbBindDataset.create().
+			loadData().
+			filterStringNotEqual(PdbbindAttribute.UNIPROT, "------").
+			filterStringNotEqual(PdbbindAttribute.RESOLUTION, "NMR").
+			sortBy(PdbbindAttribute.RESOLUTION).
+			filterDoubleCutoff(PdbbindAttribute.RESOLUTION, 2.51).getData();
+			DataHandler.printDatasetHead(datasetFiltered);
+    		
     	}
     	
     	
