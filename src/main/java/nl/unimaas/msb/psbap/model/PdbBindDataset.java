@@ -184,6 +184,21 @@ public class PdbBindDataset {
 		return this;
 	}
 	
+
+	/**
+	 *  Filter a dataset to execlude instances that has an item with a value lower than a provided double 
+	 * @param attr which is the column to be filtered in a PdbBindDataset object
+	 * @param cutoff a double value represent a threshold to filter values samller than it
+	 * @return the PdbBindDataset object after applying the filter
+	 */
+	public PdbBindDataset filterDoubleCutoff(PdbbindAttribute attr, Double cutoff) {
+		
+		this.pdbbindData = this.pdbbindData.stream().
+					filter(line -> Double.parseDouble(line[attr.ordinal()]) < cutoff).
+					collect(Collectors.toList());
+		return this;
+	}
+	
 	
 
 }
