@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import nl.unimaas.msb.psbap.model.PdbBindDataset;
+import nl.unimaas.msb.PockerSnpBindingAffinity.model.PdbBindDataset.PdbbindAttribute;
 import nl.unimaas.msb.psbap.Config;
 
 public class PdbBindDataset {
@@ -38,6 +39,11 @@ public class PdbBindDataset {
 	private String entriesPath;
 	
 	private List<String[]> pdbbindData = new ArrayList<String[]>();
+	
+	public enum PdbbindAttribute 
+	{ 
+	    PDB, RESOLUTION, LIGAND, UNIPROT, POCKET_RES_COUNT
+	} 
 	
 	/**
 	 * No-argument constructor initializes instance variables
@@ -158,9 +164,26 @@ public class PdbBindDataset {
 	 */
 	public List<String[]> getData(){
 		
-		return this.pdbbindData;
-		
+		return this.pdbbindData;		
 	}
+	
+	
+
+	/**
+	 * Filter a dataset to execlude instances that has an item that matches a provided string
+	 * @param attr which is the column to be filtered in a PdbBindDataset object
+	 * @param filterValue string value to filter the column against
+	 * @return the PdbBindDataset object after applying the filter
+	 */
+	public PdbBindDataset filterStringNotEqual(PdbbindAttribute attr, String filterValue) {
+		
+		this.pdbbindData = this.pdbbindData.stream().
+					filter(line -> !filterValue.equals(line[attr.ordinal()].trim())).
+					collect(Collectors.toList());
+
+		return this;
+	}
+	
 	
 
 }
