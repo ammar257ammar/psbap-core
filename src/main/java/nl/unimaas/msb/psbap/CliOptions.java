@@ -37,6 +37,9 @@ public class CliOptions {
 	@Option(names = {"-h", "-?", "--help" }, usageHelp = true, description = "Display a help message")
 	boolean help = false;
 
+	@Option(names = {"-op", "--operation"}, description = "select an operation to perform: print-pdbbind-head", required = true)
+	String operation = "";
+
 	CliOptions(String[] args) {
 		try {
 			CliOptions cliOptions = CommandLine.populateCommand(this, args);
