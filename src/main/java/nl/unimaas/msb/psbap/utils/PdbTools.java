@@ -20,6 +20,11 @@
 
 package nl.unimaas.msb.psbap.utils;
 
+import org.biojava.nbio.structure.align.util.AtomCache;
+import org.biojava.nbio.structure.io.FileParsingParameters;
+import org.biojava.nbio.structure.io.PDBFileReader;
+import org.biojava.nbio.structure.io.LocalPDBDirectory.FetchBehavior;
+
 /**
  * 
  * @author Ammar Ammar
@@ -29,6 +34,35 @@ package nl.unimaas.msb.psbap.utils;
  */
 
 public class PdbTools {
+	
+
+	/**
+	 * A method to configure a PDB file reader 
+	 * 
+	 * @param alignSeqAndPraseSS boolean value to specify if secondary structure info need to be parsed
+	 *        and if SEQRES sequence and ATOM sequence need to be aligned when reading a PDB file
+	 * @return a PDB file reader
+	 */
+	public static PDBFileReader configureReader(boolean alignSeqAndPraseSS){
+		
+		AtomCache cache = new AtomCache();
+
+    	FileParsingParameters params = cache.getFileParsingParams();
+    	
+    	params.setAlignSeqRes(alignSeqAndPraseSS);
+    	params.setParseSecStruc(alignSeqAndPraseSS);
+    	
+    	cache.setFileParsingParams(params);
+    	
+    	PDBFileReader reader = new PDBFileReader();
+    	
+    	reader.setFetchBehavior(FetchBehavior.LOCAL_ONLY);
+    	
+    	reader.setFileParsingParameters(params);
+    	
+    	return reader;
+	}
+	
 	
 	
 	
