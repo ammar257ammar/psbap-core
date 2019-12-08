@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -196,6 +197,19 @@ public class PdbBindDataset {
 		this.pdbbindData = this.pdbbindData.stream().
 					filter(line -> Double.parseDouble(line[attr.ordinal()]) < cutoff).
 					collect(Collectors.toList());
+		return this;
+	}
+	
+	
+	/**
+	 * Sort a PdbBindDataset object by a specified column
+	 * @param attr the column to be sorted by
+	 * @return the PdbBindDataset object after sorting
+	 */
+	public PdbBindDataset sortBy(PdbbindAttribute attr) {
+		
+		this.pdbbindData.sort(Comparator.comparing(line -> line[attr.ordinal()]));
+		
 		return this;
 	}
 	
