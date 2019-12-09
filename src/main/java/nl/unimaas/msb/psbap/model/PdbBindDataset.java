@@ -24,13 +24,21 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.biojava.nbio.structure.Chain;
+import org.biojava.nbio.structure.Structure;
+import org.biojava.nbio.structure.io.PDBFileReader;
+
 import nl.unimaas.msb.psbap.model.PdbBindDataset;
-import nl.unimaas.msb.PockerSnpBindingAffinity.model.PdbBindDataset.PdbbindAttribute;
+import nl.unimaas.msb.psbap.model.PdbBindDataset.PdbbindAttribute;
+import nl.unimaas.msb.psbap.utils.PdbTools;
 import nl.unimaas.msb.psbap.Config;
 
 public class PdbBindDataset {
@@ -157,8 +165,7 @@ public class PdbBindDataset {
 			
 		return this;
 	}
-	
-	
+		
 	/**
 	 *  get the data of the PdbBindDataset object as List<String[]> dataset
 	 * @return
@@ -166,9 +173,7 @@ public class PdbBindDataset {
 	public List<String[]> getData(){
 		
 		return this.pdbbindData;		
-	}
-	
-	
+	}	
 
 	/**
 	 * Filter a dataset to execlude instances that has an item that matches a provided string
@@ -200,7 +205,6 @@ public class PdbBindDataset {
 		return this;
 	}
 	
-	
 	/**
 	 * Sort a PdbBindDataset object by a specified column
 	 * @param attr the column to be sorted by
@@ -213,6 +217,49 @@ public class PdbBindDataset {
 		return this;
 	}
 	
+
+
+	/**
+	 * A method to keep one PDB for each Uniprot ID by grouping by Uniport ID and select the PDB
+	 * with the minimum resolution for that Uniprot ID
+	 * @param preserveLigandData boolean value to specify if ligands IDs 
+	 * for all PDBs for a Uniprot ID should be saved
+	 * @return the PdbBindDataset object after grouping
+	 */
+	public PdbBindDataset groupByUniProtAndKeepMinResolution(boolean preserveLigandData) {
+		
+		Map<Object, List<String[]>> map = this.pdbbindData.stream().
+				collect(Collectors.groupingBy(line -> line[PdbbindAttribute.UNIPROT.ordinal()]));
+		
+		this.pdbbindData.clear();
+				
+		Iterator<?> it = map.entrySet().iterator();
+		
+	    while (it.hasNext()) {
+	    	
+	        @SuppressWarnings("unchecked")
+			Map.Entry<String, List<String[]>> pair = (Map.Entry<String, List<String[]>>)it.next();
+	        
+	        List<String[]> ligandAndRes = (List<String[]>) pair.getValue();
+
+	        String[] ligandAndResMin = Collections.min(ligandAndRes, Comparator.comparing(c -> c[1]));
+
+	        if(preserveLigandData) {
+	        	String ligandData = "";
+	        	for(String[] row: ligandAndRes) {
+	        		ligandData += row[PdbbindAttribute.PDB.ordinal()]+":"+row[PdbbindAttribute.LIGAND.ordinal()]+";";
+	        	}
+	        	ligandAndResMin[PdbbindAttribute.LIGAND.ordinal()] = ligandData;
+	        }
+
+	        
+			this.pdbbindData.add(ligandAndResMin);
+
+	        it.remove(); // avoids a ConcurrentModificationException
+	    }
+		
+		return this;
+	}
 	
 
 }
