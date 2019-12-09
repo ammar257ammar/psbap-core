@@ -20,6 +20,10 @@
 
 package nl.unimaas.msb.psbap;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 /**
  * 
  * @author Ammar Ammar
@@ -29,5 +33,61 @@ package nl.unimaas.msb.psbap;
  */
 
 public class DockerCommander {
+	
+
+	/**
+	 * A method to dowload SIFTS files from a TSV file of URLs one in each line
+	 * @param path a string of the path of the downloaded SIFTS files
+	 * @param downloadUrlsPath a string of the path of the TSV file of SIFTS URLs
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	public static void downloadSifts(String path, String downloadUrlsPath) throws IOException, InterruptedException {
+				
+		ProcessBuilder builder = new ProcessBuilder();
+		
+		builder.command("docker","run",
+				"-v", path+":/sifts",
+				"-v", "/home/apc/workspace/PockerSnpBindingAffinity/"+downloadUrlsPath+":/url",
+				"sifts", "--quiet", "--no-clobber","--retry-connrefused","--waitretry=1","--read-timeout=60","--timeout=60","-t","0","-i","/url/pdbbind_sifts_urls.tsv");
+		
+		System.out.println("Process started!!");
+
+		Process process = builder.start();
+		
+		BufferedReader error = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+
+	    BufferedReader output = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+		StringBuilder sbuilder = new StringBuilder();
+		
+		String line = null;
+		
+		while ( (line = output.readLine()) != null) {
+			System.out.println("in the output!!");
+			sbuilder.append(line);
+		   sbuilder.append(System.getProperty("line.separator"));
+		}	    
+		
+		System.out.println("Wating for download to finish!!");
+		
+	    int exitVal = process.waitFor();
+		if (exitVal == 0) {
+			System.out.println("Success!");
+			System.out.println(sbuilder.toString());
+		} else {
+			System.out.println(error.readLine());
+		}
+	    
+		System.out.println("Download finished!!");
+
+		process.destroy();
+		if (process.isAlive()) {
+		    process.destroyForcibly();
+		}	
+		
+		System.out.println("Process destroyed!!");
+
+	}
 
 }
