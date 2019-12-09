@@ -20,6 +20,7 @@
 
 package nl.unimaas.msb.psbap.model;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -257,6 +258,39 @@ public class PdbBindDataset {
 
 	        it.remove(); // avoids a ConcurrentModificationException
 	    }
+		
+		return this;
+	}
+	
+
+	/**
+	 * A method to filter the PdbBindDataset to a folder structure like (coreset, refinedset, generalset)
+	 * from the PdbBind dataset or any custom subset.
+	 * @return the PdbBindDataset object after grouping
+	 */
+	public PdbBindDataset keepAsFolderMatch(){
+		
+		List<String[]> tempList = new ArrayList<String[]>();
+
+		File casf = new File(this.entriesPath);
+		File[] mols = casf.listFiles();
+				
+		for(File molFolder: mols) {
+			if(molFolder.isDirectory()) {
+					
+				for(int i = 0; i < this.pdbbindData.size(); i++) {
+					
+					String[] row = this.pdbbindData.get(i);
+
+					if(molFolder.getName().trim().toLowerCase().equals(row[0].trim().toLowerCase())) {
+						tempList.add(row);
+					}
+				}
+				
+			}
+		}
+		
+		this.pdbbindData = new ArrayList<String[]>(tempList);
 		
 		return this;
 	}
