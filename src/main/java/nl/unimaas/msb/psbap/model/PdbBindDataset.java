@@ -296,4 +296,26 @@ public class PdbBindDataset {
 	}
 	
 
+	/**
+	 * A method to create a dataset of SIFTS download URLs for PdbBindDataset PDB IDs
+	 * @return  the PdbBindDataset object after grouping
+	 */
+	public List<String[]> asSiftsDownloadUrlsList(){
+		
+		List<String[]> newPdbbindData = new ArrayList<String[]>();
+
+		for(int i = 0; i < this.pdbbindData.size(); i++) {
+
+			String url = "http://ftp.ebi.ac.uk/pub/databases/msd/sifts/xml/" + 
+						this.pdbbindData.get(i)[PdbbindAttribute.PDB.ordinal()] + 
+						".xml.gz";
+			
+			newPdbbindData.add(new String[] {url});
+			
+		}
+				
+		return newPdbbindData;
+	}
+	
+
 }
