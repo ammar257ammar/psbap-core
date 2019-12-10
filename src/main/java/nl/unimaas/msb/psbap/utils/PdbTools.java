@@ -26,10 +26,9 @@ import org.biojava.nbio.structure.io.PDBFileReader;
 import org.biojava.nbio.structure.io.LocalPDBDirectory.FetchBehavior;
 
 /**
- * 
- * @author Ammar Ammar
- *
  * A utility class to perform operations on PDB and SIFTS files related to PdbBind Datasets
+ *  
+ * @author Ammar Ammar
  * 
  */
 

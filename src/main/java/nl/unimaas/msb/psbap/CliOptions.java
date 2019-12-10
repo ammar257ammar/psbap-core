@@ -25,10 +25,10 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 /**
+ * A command line interface class to parse the command line parameters and execute the corresponding tasks
  * 
  * @author Ammar Ammar
  *
- * A command line interface class to parse the command line parameters and execute the corresponding tasks
  */
 
 @Command(name = "psbap")

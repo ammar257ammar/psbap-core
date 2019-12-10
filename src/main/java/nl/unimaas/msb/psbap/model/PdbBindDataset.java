@@ -33,20 +33,14 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.biojava.nbio.structure.Chain;
-import org.biojava.nbio.structure.Structure;
-import org.biojava.nbio.structure.io.PDBFileReader;
-
-import nl.unimaas.msb.psbap.model.PdbBindDataset;
-import nl.unimaas.msb.psbap.model.PdbBindDataset.PdbbindAttribute;
-import nl.unimaas.msb.psbap.utils.PdbTools;
 import nl.unimaas.msb.psbap.Config;
 
 /**
- * @author Ammar Ammar
- *
  * A class represents a PdbBind dataset object with methods to manipulate the dataset (filtering,
  * sorting, grouping and generating URLs)
+ * 
+ * @author Ammar Ammar
+ *
  */
 public class PdbBindDataset {
 	
@@ -105,8 +99,8 @@ public class PdbBindDataset {
 	}
 	
 	/**
-	 * Load the data from the two files provided by PdbBind downloaded file <http://www.pdbbind.org.cn>
-	 * @return the current PdbBindDataset after loading "pdbbindData" List<String> with data
+	 * Load the data from the two files provided by PdbBind downloaded file (http://www.pdbbind.org.cn)
+	 * @return the current PdbBindDataset after loading "pdbbindData" List with data
 	 * from both files of PdbBind
 	 */
 	public PdbBindDataset loadData() {
@@ -174,8 +168,8 @@ public class PdbBindDataset {
 	}
 		
 	/**
-	 *  get the data of the PdbBindDataset object as List<String[]> dataset
-	 * @return
+	 * Get the data of the PdbBindDataset object as List dataset
+	 * @return the dataset list of the current PdbBindDataset object
 	 */
 	public List<String[]> getData(){
 		

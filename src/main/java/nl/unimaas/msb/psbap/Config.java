@@ -26,14 +26,13 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * 
- * @author Ammar Ammar
- * 
  * Base class to read the configuration from a config file 
  * and load it into a Properties object
  * 
  * The class assumes a file named "config.properties" next to 
  * the application JAR and tries to load it
+ * 
+ * @author Ammar Ammar
  *
  */
 public class Config {

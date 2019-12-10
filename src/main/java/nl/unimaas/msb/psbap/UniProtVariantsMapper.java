@@ -34,17 +34,17 @@ import nl.unimaas.msb.psbap.model.PdbBindDataset.PdbbindAttribute;
 
 
 /**
- * @author Ammar Ammar
- * 
  * This class map between the Uniprot variants dataset with PdbBind dataset and filter the 
  * missence variants that occur in PdbBind proteins only
+ * 
+ * @author Ammar Ammar
  * 
  */
 public class UniProtVariantsMapper {
 	
 	/**
 	 * A method to filter missense variants that occur in PdbBind proteins
-	 * @param pdbbindDataset
+	 * @param pdbbindDataset to filter UniProt variants against
 	 * @return a dataset with all missence variants in PdbBind proteins
 	 */
 	public static List<String[]> mapMissenseVariantsToPdbbindDataset(List<String[]> pdbbindDataset) {
