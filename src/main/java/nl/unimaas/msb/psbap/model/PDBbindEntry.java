@@ -20,6 +20,14 @@
 
 package nl.unimaas.msb.psbap.model;
 
+import java.util.List;
+
+import org.biojava.nbio.structure.AminoAcid;
+import org.biojava.nbio.structure.Structure;
+import org.biojava.nbio.structure.io.PDBFileReader;
+import org.biojava.nbio.structure.io.sifts.SiftsEntity;
+import org.biojava.nbio.structure.io.sifts.SiftsResidue;
+import org.openscience.cdk.interfaces.IAtomContainer;
 
 /**
  * A class that represent a PdbBind entry folder including all information (amino acids, ligands and SIFTS)
@@ -28,5 +36,21 @@ package nl.unimaas.msb.psbap.model;
  *
  */
 public class PDBbindEntry {
+	
+	private Structure proteinStructure = null;
+	private Structure pocketStructure = null;
+	private IAtomContainer ligandStructure = null;
+	
+	private List<SiftsEntity> siftEntities = null;
+	
+	private List<SiftsResidue> siftResidues = null;
+	
+	private List<AminoAcid> pocketAminoAcids = null;
+
+	private List<AminoAcid> proteinAminoAcids = null;
+
+	private PDBFileReader reader;	
+	
+	private String pdb;
 
 }
