@@ -42,6 +42,12 @@ import nl.unimaas.msb.psbap.model.PdbBindDataset.PdbbindAttribute;
 import nl.unimaas.msb.psbap.utils.PdbTools;
 import nl.unimaas.msb.psbap.Config;
 
+/**
+ * @author Ammar Ammar
+ *
+ * A class represents a PdbBind dataset object with methods to manipulate the dataset (filtering,
+ * sorting, grouping and generating URLs)
+ */
 public class PdbBindDataset {
 	
 	private String pathGeneralFile;
@@ -217,8 +223,6 @@ public class PdbBindDataset {
 		
 		return this;
 	}
-	
-
 
 	/**
 	 * A method to keep one PDB for each Uniprot ID by grouping by Uniport ID and select the PDB
@@ -317,5 +321,4 @@ public class PdbBindDataset {
 		return newPdbbindData;
 	}
 	
-
 }
