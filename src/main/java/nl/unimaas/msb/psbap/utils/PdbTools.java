@@ -20,9 +20,12 @@
 
 package nl.unimaas.msb.psbap.utils;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.biojava.nbio.core.util.InputStreamProvider;
 import org.biojava.nbio.structure.AminoAcid;
 import org.biojava.nbio.structure.Chain;
 import org.biojava.nbio.structure.Group;
@@ -31,6 +34,8 @@ import org.biojava.nbio.structure.Structure;
 import org.biojava.nbio.structure.align.util.AtomCache;
 import org.biojava.nbio.structure.io.FileParsingParameters;
 import org.biojava.nbio.structure.io.LocalPDBDirectory.FetchBehavior;
+import org.biojava.nbio.structure.io.sifts.SiftsEntity;
+import org.biojava.nbio.structure.io.sifts.SiftsXMLParser;
 import org.biojava.nbio.structure.io.PDBFileReader;
 
 
@@ -97,6 +102,33 @@ public class PdbTools {
 		}
 		return aaList;
 	}
+	
+	/**
+	 * Get a list of Sifts entities from the SIFTS file corresponding to a PdbBind PDB ID
+	 * @param path of the downloaded SIFTS files
+	 * @param pdb which is the ID for the PDB needed to get its SIFTS
+	 * @return a list of SIFTS entities for a specfic PDB ID
+	 */
+	public static List<SiftsEntity> getSiftsEntitiesForPDB(String path,String pdb){
+		
+		InputStreamProvider prov = new InputStreamProvider();
+		InputStream is;
+		
+		try {
+			
+			is = prov.getInputStream(path + "/" + pdb + ".xml.gz");
+		
+			SiftsXMLParser siftParser = new SiftsXMLParser();
+	
+			siftParser.parseXmlFile(is);
+	
+			List<SiftsEntity> entities = siftParser.getEntities();
+			
+			return entities;
+		} catch (IOException e) {
+			return null;
+		}		
+	} 
 	
 	
 	
