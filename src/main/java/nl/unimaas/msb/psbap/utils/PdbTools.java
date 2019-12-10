@@ -35,6 +35,8 @@ import org.biojava.nbio.structure.align.util.AtomCache;
 import org.biojava.nbio.structure.io.FileParsingParameters;
 import org.biojava.nbio.structure.io.LocalPDBDirectory.FetchBehavior;
 import org.biojava.nbio.structure.io.sifts.SiftsEntity;
+import org.biojava.nbio.structure.io.sifts.SiftsResidue;
+import org.biojava.nbio.structure.io.sifts.SiftsSegment;
 import org.biojava.nbio.structure.io.sifts.SiftsXMLParser;
 import org.biojava.nbio.structure.io.PDBFileReader;
 
@@ -130,7 +132,31 @@ public class PdbTools {
 		}		
 	} 
 	
-	
+	/**
+	 * A method to extract SIFTS residues from SIFTS entities list and store them in a List
+	 * @param siftsEntities a List of entities extracted from a SIFTS file for a certain PDB
+	 * @return a list of SIFTS residues
+	 */
+	public static List<SiftsResidue> getSiftResiduesFromSiftsMapping(List<SiftsEntity> siftsEntities){
+		
+		List<SiftsResidue> srList = new ArrayList<SiftsResidue>();
+		
+		for (SiftsEntity entity : siftsEntities){
+
+			if(entity.getType().equals("protein")){
+				
+	            for ( SiftsSegment seg: entity.getSegments()) {
+	                
+	                for ( SiftsResidue res: seg.getResidues() ) {
+	                	
+	                	srList.add(res);
+	                
+	                }
+	            }
+			}
+		}
+		return srList;
+	}
 	
 
 }
