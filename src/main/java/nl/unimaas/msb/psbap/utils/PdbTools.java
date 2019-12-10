@@ -20,10 +20,19 @@
 
 package nl.unimaas.msb.psbap.utils;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.biojava.nbio.structure.AminoAcid;
+import org.biojava.nbio.structure.Chain;
+import org.biojava.nbio.structure.Group;
+import org.biojava.nbio.structure.GroupType;
+import org.biojava.nbio.structure.Structure;
 import org.biojava.nbio.structure.align.util.AtomCache;
 import org.biojava.nbio.structure.io.FileParsingParameters;
-import org.biojava.nbio.structure.io.PDBFileReader;
 import org.biojava.nbio.structure.io.LocalPDBDirectory.FetchBehavior;
+import org.biojava.nbio.structure.io.PDBFileReader;
+
 
 /**
  * A utility class to perform operations on PDB and SIFTS files related to PdbBind Datasets
@@ -62,6 +71,32 @@ public class PdbTools {
     	return reader;
 	}
 	
+
+	/**
+	 * A static method to extract AminoAcids from a BioJava Structure object and store the in a List
+	 * 
+	 * @param structure as a BioJava Structure object
+	 * @return a list of AminoAcids extracted from the structure
+	 */
+	public static List<AminoAcid> getAminoAcidsFromStructure(Structure structure){
+		
+		List<AminoAcid> aaList = new ArrayList<AminoAcid>();
+		
+		for(Chain chain: structure.getChains()) {
+        	
+			List<Group> groups = chain.getAtomGroups(GroupType.AMINOACID);
+			
+			for (Group group : groups) {
+		    
+				AminoAcid aa = (AminoAcid) group;
+				
+				aaList.add(aa);
+				
+			}
+			
+		}
+		return aaList;
+	}
 	
 	
 	
