@@ -23,6 +23,7 @@ package nl.unimaas.msb.psbap;
 import java.util.List;
 
 import nl.unimaas.msb.psbap.model.PdbBindDataset.PdbbindAttribute;
+import nl.unimaas.msb.psbap.SiftsPocketResiduesMapper;
 import nl.unimaas.msb.psbap.UniProtVariantsMapper;
 import nl.unimaas.msb.psbap.model.PdbBindDataset;
 import nl.unimaas.msb.psbap.utils.DataHandler;
@@ -99,10 +100,36 @@ public class PSBAP
     		
     	case "map-pocket-residues-to-uniprot-variants":
 
-    		
+    		List<String[]> pdbbindPocketVariants = SiftsPocketResiduesMapper.
+			mapPocketResidues(Config.getProperty("DATASETS_PATH") + "/pdbbind_protein_variants.tsv",
+							  Config.getProperty("DATASETS_PATH") + "/pdbbind_entries_data.tsv",
+							  "pocket");
+
+			String[] header = new String[]{"gene_name",
+											"uniprot",
+											"snp",
+											"rs_id",
+											"pdb",
+											"min_res",
+											"ligand",
+											"sourceAminoAcid",
+											"targetAminoAcid",
+											"residueNum",
+											"chain",
+											"PdbResName",
+											"PdbResNum",
+											"aaPDBName",
+											"aaResidueNumber",
+											"UniProtResName",
+											"UniProtPos",
+											"UniProtAccessionId",
+											"PdbId",
+											"SeqResName",
+											"NaturalPos"};
+			
+			DataHandler.writeDatasetToTSV(pdbbindPocketVariants, Config.getProperty("DATASETS_PATH") + "/pdbbind_pocket_variants.tsv", header);
+
     		break;
-    	}
-    	
-    	
+    	}	
     }
 }
