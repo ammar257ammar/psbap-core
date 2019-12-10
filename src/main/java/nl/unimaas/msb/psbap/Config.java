@@ -44,7 +44,7 @@ public class Config {
 
 		try {
 
-			input = new FileInputStream("config.properties");
+			input = new FileInputStream("/config/config.properties");
 
 			properties.load(input);
 
