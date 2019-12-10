@@ -23,6 +23,7 @@ package nl.unimaas.msb.psbap;
 import java.util.List;
 
 import nl.unimaas.msb.psbap.model.PdbBindDataset.PdbbindAttribute;
+import nl.unimaas.msb.psbap.UniProtVariantsMapper;
 import nl.unimaas.msb.psbap.model.PdbBindDataset;
 import nl.unimaas.msb.psbap.utils.DataHandler;
 
@@ -41,18 +42,65 @@ public class PSBAP
     	
     	switch(cli.operation){
     	
-    	case "print-pdbbind-head":
-    		List<String[]> dataset = PdbBindDataset.create().loadData().getData();
-			DataHandler.printDatasetHead(dataset);
+    	case "generate-pdbbind-dataset":
+    		
+    		PdbBindDataset pdbbindData = PdbBindDataset.create().
+											loadData().
+											filterStringNotEqual(PdbbindAttribute.UNIPROT, "------").
+											filterStringNotEqual(PdbbindAttribute.RESOLUTION, "NMR").
+											sortBy(PdbbindAttribute.RESOLUTION).
+											keepAsFolderMatch().
+											filterDoubleCutoff(PdbbindAttribute.RESOLUTION, 2.51).
+											groupByUniProtAndKeepMinResolution(true);
+    		
+    	    DataHandler.writeDatasetToTSV(pdbbindData.getData(), Config.getProperty("DATASETS_PATH") + "/pdbbind_entries_data.tsv");
+
+    	    DataHandler.printDatasetStats(pdbbindData.getData());
+
+    	    DataHandler.printDatasetHead(pdbbindData.getData());
+    	    
 			break;
-    	case "print-filtered-sorted":
-    		List<String[]> datasetFiltered = PdbBindDataset.create().
-			loadData().
-			filterStringNotEqual(PdbbindAttribute.UNIPROT, "------").
-			filterStringNotEqual(PdbbindAttribute.RESOLUTION, "NMR").
-			sortBy(PdbbindAttribute.RESOLUTION).
-			filterDoubleCutoff(PdbbindAttribute.RESOLUTION, 2.51).getData();
-			DataHandler.printDatasetHead(datasetFiltered);		
+			
+    	case "generate-sifts-urls":
+    				
+    		PdbBindDataset pdbbindDataForSifts = PdbBindDataset.create().
+											loadData().
+											filterStringNotEqual(PdbbindAttribute.UNIPROT, "------").
+											filterStringNotEqual(PdbbindAttribute.RESOLUTION, "NMR").
+											sortBy(PdbbindAttribute.RESOLUTION).
+											keepAsFolderMatch().
+											filterDoubleCutoff(PdbbindAttribute.RESOLUTION, 2.51).
+											groupByUniProtAndKeepMinResolution(true);
+
+        	List<String[]> pdbbindDataSiftsUrls = pdbbindDataForSifts.asSiftsDownloadUrlsList();    	
+        	
+        	DataHandler.writeDatasetToTSV(pdbbindDataSiftsUrls, Config.getProperty("DATASETS_PATH") + "/pdbbind_sifts_urls.tsv");
+    		
+    		break;
+    		
+    	case "map-uniprot-variant-to-proteins":
+    		
+    		PdbBindDataset pdbbindDataForVariants = PdbBindDataset.create().
+													loadData().
+													filterStringNotEqual(PdbbindAttribute.UNIPROT, "------").
+													filterStringNotEqual(PdbbindAttribute.RESOLUTION, "NMR").
+													sortBy(PdbbindAttribute.RESOLUTION).
+													keepAsFolderMatch().
+													filterDoubleCutoff(PdbbindAttribute.RESOLUTION, 2.51).
+													groupByUniProtAndKeepMinResolution(true);
+    		
+    		List<String[]> pdbbindVariants = UniProtVariantsMapper.mapMissenseVariantsToPdbbindDataset(pdbbindDataForVariants.getData());
+	    	
+    		DataHandler.writeDatasetToTSV(pdbbindVariants, Config.getProperty("DATASETS_PATH") + "/pdbbind_protein_variants.tsv");  	
+	    	
+    		System.gc();
+    		
+    		break;
+    		
+    	case "map-pocket-residues-to-uniprot-variants":
+
+    		
+    		break;
     	}
     	
     	
