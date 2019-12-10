@@ -27,7 +27,9 @@ import nl.unimaas.msb.psbap.model.PdbBindDataset;
 import nl.unimaas.msb.psbap.utils.DataHandler;
 
 /**
- * Hello world!
+ * This class perform the tasks passed through command line
+ * 
+ * @author Ammar Ammar
  *
  */
 public class PSBAP 
@@ -50,8 +52,7 @@ public class PSBAP
 			filterStringNotEqual(PdbbindAttribute.RESOLUTION, "NMR").
 			sortBy(PdbbindAttribute.RESOLUTION).
 			filterDoubleCutoff(PdbbindAttribute.RESOLUTION, 2.51).getData();
-			DataHandler.printDatasetHead(datasetFiltered);
-    		
+			DataHandler.printDatasetHead(datasetFiltered);		
     	}
     	
     	

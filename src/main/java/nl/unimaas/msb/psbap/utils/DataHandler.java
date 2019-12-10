@@ -30,12 +30,12 @@ import com.univocity.parsers.tsv.TsvWriter;
 import com.univocity.parsers.tsv.TsvWriterSettings;
 
 /**
+ * A utility class to perform operations on datasets of type List (String[])
+ * It can print first rows of the dataset, return number of rows and columns, 
+ * and write the dataset to TSV file
  * 
  * @author Ammar Ammar
  * 
- * A utility class to perform operations on datasets of type List<String[]>
- * It can print first rows of the dataset, return number of rows and columns, 
- * and write the dataset to TSV file
  */
 public class DataHandler {
 
@@ -78,7 +78,7 @@ public class DataHandler {
 	
 	/**
 	 * Print the first N rows of the specified dataset to console (to examine the dataset)
-	 * @param dataset
+	 * @param dataset to print its head
 	 * @param num number of rows to be printed
 	 */
 	public static void printDatasetHead(List<String[]> dataset, int num) {
@@ -97,8 +97,8 @@ public class DataHandler {
 
 	/**
 	 * Overload the method printDatasetHead(dataset, num) to print always the first 10 rows to console
-	 * @see printDatasetHead(List<String[]>, int) 
-	 * @param dataset
+	 * @see #printDatasetHead(List, int) 
+	 * @param dataset to print its head
 	 */
 	public static void printDatasetHead(List<String[]> dataset) {
 		
@@ -109,7 +109,7 @@ public class DataHandler {
 
 	/**
 	 *  Print the number of columns and rows of the specified dataset to the console
-	 * @param dataset
+	 * @param dataset to print its stats
 	 */
 	public static void printDatasetStats(List<String[]> dataset) {
 		
