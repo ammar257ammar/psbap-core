@@ -52,5 +52,191 @@ public class PDBbindEntry {
 	private PDBFileReader reader;	
 	
 	private String pdb;
+	
+	
+	/**
+	 * check if the current entry has protein structure (i.e. the PDB files is parsed correctly)
+	 * @return a boolean value True or False
+	 */
+	public boolean hasProteinStructure(){
+		return this.proteinStructure != null;
+	}
+
+	/**
+	 * check if the current entry has pocket structure (i.e. the PDB files is parsed correctly)
+	 * @return a boolean value True or False
+	 */
+	public boolean hasPocketStructure(){
+		return this.pocketStructure != null;
+	}
+	
+	/**
+	 * check if the current entry has ligand structure (i.e. the Mol files is parsed correctly)
+	 * @return a boolean value True or False
+	 */
+	public boolean hasLigandStructure(){
+		return this.ligandStructure != null;
+	}
+	
+	/**
+	 * check if the current entry has a SIFTS mapping (i.e. the SIFTS file is parsed correctly)
+	 * @return a boolean value True or False
+	 */
+	public boolean hasSiftsMapping(){
+		return this.siftEntities != null;
+	}
+
+	/**
+	 * Get the protein structure as BioJava Structure object
+	 * @return a BioJava Structure object
+	 */
+	public Structure getProteinStructure() {
+		return proteinStructure;
+	}
+
+	/**
+	 * Set the protein structure as BioJava Structure object
+	 * @param proteinStructure a BioJava Structure object
+	 */
+	public void setProteinStructure(Structure proteinStructure) {
+		this.proteinStructure = proteinStructure;
+	}
+
+	/**
+	 * Get the pocket structure as BioJava Structure object
+	 * @return a BioJava Structure object
+	 */
+	public Structure getPocketStructure() {
+		return pocketStructure;
+	}
+
+	/**
+	 * Set the pocket structure as BioJava Structure object
+	 * @param pocketStructure a BioJava Structure object
+	 */
+	public void setPocketStructure(Structure pocketStructure) {
+		this.pocketStructure = pocketStructure;
+	}
+
+	/**
+	 * Get the ligand structure as CDK IAtomContainer object
+	 * @return a BioJava Structure object
+	 */
+	public IAtomContainer getLigandStructure() {
+		return ligandStructure;
+	}
+
+	/**
+	 * Set the ligand structure as CDK IAtomContainer object
+	 * @param ligandStructure a CDK IAtomContainer object
+	 */
+	public void setLigandStructure(IAtomContainer ligandStructure) {
+		this.ligandStructure = ligandStructure;
+	}
+
+	/**
+	 * Get SIFTS entities for the current PDBbindEntry
+	 * @return a List of SiftsEntity
+	 */
+	public List<SiftsEntity> getSiftEntities() {
+		return siftEntities;
+	}
+
+	/**
+	 * Set a list of SIFTS entities for the current PDBbindEntry
+	 * @param siftEntities a List of SiftsEntity
+	 */
+	public void setSiftEntities(List<SiftsEntity> siftEntities) {
+		this.siftEntities = siftEntities;
+	}
+
+	
+	/**
+	 * Get SIFTS residues for the current PDBbindEntry
+	 * @return a List of SiftsResidue
+	 */
+	public List<SiftsResidue> getSiftResidues() {
+		return siftResidues;
+	}
+
+	/**
+	 * Set a list of SIFTS residues for the current PDBbindEntry
+	 * @param siftResidues a List of SiftsResidue
+	 */
+	public void setSiftResidues(List<SiftsResidue> siftResidues) {
+		this.siftResidues = siftResidues;
+	}
+
+	
+	/**
+	 * Get a list of AminoAcid from the pocket structure of a PDBbindEntry
+	 * @return a list of AminoAcid
+	 */
+	public List<AminoAcid> getPocketAminoAcids() {
+		return pocketAminoAcids;
+	}
+
+	/**
+	 * Set a list of AminoAcid from the pocket structure to a PDBbindEntry
+	 * @param pocketAminoAcids a list of AminoAcid objects
+	 */
+	public void setPocketAminoAcids(List<AminoAcid> pocketAminoAcids) {
+		this.pocketAminoAcids = pocketAminoAcids;
+	}
+
+	/**
+	 * Get a list of AminoAcid from the protein structure of a PDBbindEntry
+	 * @return a list of AminoAcid
+	 */
+	public List<AminoAcid> getProteinAminoAcids() {
+		return proteinAminoAcids;
+	}
+
+	/**
+	 * Set a list of AminoAcid from the protein structure to a PDBbindEntry
+	 * @param proteinAminoAcids a list of AminoAcid objects
+	 */
+	public void setProteinAminoAcids(List<AminoAcid> proteinAminoAcids) {
+		this.proteinAminoAcids = proteinAminoAcids;
+	}
+
+	/**
+	 * Get a PDB reader object
+	 * @return a PDBFileReader
+	 */
+	public PDBFileReader getReader() {
+		return reader;
+	}
+
+	/**
+	 * Set a PDB reader object
+	 * @param reader a PDBFileReader
+	 */
+	public void setReader(PDBFileReader reader) {
+		this.reader = reader;
+	}
+
+	/**
+	 * Get PDB ID
+	 * @return a String of the PDB ID of current PDBbindEntry
+	 */
+	public String getPdb() {
+		return pdb;
+	}
+
+	/**
+	 * Set PDB ID
+	 * @param pdb a String of the PDB ID of current PDBbindEntry
+	 */
+	public void setPdb(String pdb) {
+		this.pdb = pdb;
+	}
+
+	@Override
+	public String toString() {
+		return "PDBbindEntry [proteinStructure=" + proteinStructure.getName() + ", pocketStructure=" + pocketStructure.getName()
+				+ ", PDB ID=" + this.pdb
+				+ "]";
+	}
 
 }
