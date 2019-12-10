@@ -20,6 +20,7 @@
 
 package nl.unimaas.msb.psbap.model;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.biojava.nbio.structure.AminoAcid;
@@ -28,6 +29,10 @@ import org.biojava.nbio.structure.io.PDBFileReader;
 import org.biojava.nbio.structure.io.sifts.SiftsEntity;
 import org.biojava.nbio.structure.io.sifts.SiftsResidue;
 import org.openscience.cdk.interfaces.IAtomContainer;
+
+import nl.unimaas.msb.psbap.Config;
+import nl.unimaas.msb.psbap.utils.LigandTools;
+import nl.unimaas.msb.psbap.utils.PdbTools;
 
 /**
  * A class that represent a PdbBind entry folder including all information (amino acids, ligands and SIFTS)
@@ -52,6 +57,55 @@ public class PDBbindEntry {
 	private PDBFileReader reader;	
 	
 	private String pdb;
+	
+	
+	/**
+	 * Non-argument constructor
+	 */
+	public PDBbindEntry() {
+		this("", false, false);
+	}
+
+	/**
+	 * A constructor for the PDBbindEntry object class that initializes the object with seveal
+	 * parsed information (protein structure, pocket structure, ligand structure, SIFTS data)
+	 * 
+	 * @param pdb the PDB ID from the PdbBind dataset
+	 * @param parseLigand boolean to specifiy if the secondary structure information and sequence 
+	 * alignment should be performed by BioJava when parsing the PDB files
+	 * @param alignSeqAndPraseSS
+	 */
+	public PDBbindEntry(String pdb, boolean parseLigand, boolean alignSeqAndPraseSS) {
+		
+		this.pdb = pdb;
+		this.reader = PdbTools.configureReader(alignSeqAndPraseSS);
+				
+		try {
+			this.proteinStructure = reader.getStructure(Config.getProperty("PDBBIND_ENTRIES_PATH")+"/"+pdb+"/"+pdb+"_protein.pdb");
+			this.proteinAminoAcids = PdbTools.getAminoAcidsFromStructure(this.proteinStructure);		
+		} catch (IOException e) {
+			this.proteinStructure = null;
+		}
+		
+		try {
+			this.pocketStructure = reader.getStructure(Config.getProperty("PDBBIND_ENTRIES_PATH")+"/"+pdb+"/"+pdb+"_pocket.pdb");
+			this.pocketAminoAcids = PdbTools.getAminoAcidsFromStructure(this.pocketStructure);
+		} catch (IOException e) {
+			this.pocketStructure = null;
+		}
+		 
+		if(parseLigand){
+			this.ligandStructure  = LigandTools.readMolandAromatizeKekulize(Config.getProperty("PDBBIND_ENTRIES_PATH")+"/"+pdb+"/"+pdb+"_ligand.mol2");			
+		}
+		
+		this.siftEntities = PdbTools.getSiftsEntitiesForPDB(Config.getProperty("SIFTS_PATH"), pdb);
+		
+		if(this.siftEntities != null){
+			this.siftResidues = PdbTools.getSiftResiduesFromSiftsMapping(this.siftEntities);		
+		}
+		
+	}
+	
 	
 	
 	/**
