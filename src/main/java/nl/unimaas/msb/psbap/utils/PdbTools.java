@@ -20,10 +20,18 @@
 
 package nl.unimaas.msb.psbap.utils;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.biojava.nbio.core.util.InputStreamProvider;
 import org.biojava.nbio.structure.AminoAcid;
@@ -38,6 +46,12 @@ import org.biojava.nbio.structure.io.sifts.SiftsEntity;
 import org.biojava.nbio.structure.io.sifts.SiftsResidue;
 import org.biojava.nbio.structure.io.sifts.SiftsSegment;
 import org.biojava.nbio.structure.io.sifts.SiftsXMLParser;
+
+import com.univocity.parsers.csv.CsvParser;
+import com.univocity.parsers.csv.CsvParserSettings;
+
+import nl.unimaas.msb.psbap.model.PDBbindEntry;
+
 import org.biojava.nbio.structure.io.PDBFileReader;
 
 
@@ -76,6 +90,36 @@ public class PdbTools {
     	reader.setFileParsingParameters(params);
     	
     	return reader;
+	}
+	
+	/**
+	 * A method to parse PDBbindEntry from a PsbBind dataset TSV file and store the results in a map
+	 * @param path of the PdbBind dataset TSV file
+	 * @return a map with PDB ID as a key and PDBbindEntry as a value
+	 */
+	public static Map<String, PDBbindEntry> parsePDBbindEntriesFromFile(String path){
+
+		CsvParserSettings settings = new CsvParserSettings();
+		
+		settings.getFormat().setLineSeparator("\n");
+		settings.getFormat().setDelimiter('\t');
+
+		CsvParser parser = new CsvParser(settings);
+		
+		List<String[]> rows = parser.parseAll(new File(path));
+		
+		Map<String,PDBbindEntry> pdbbindEntries = new HashMap<String, PDBbindEntry>();
+		
+		PDBbindEntry  entry = null;
+		
+		for (String[] row: rows){			
+			
+			entry = new PDBbindEntry(row[0], false, false);
+			
+			pdbbindEntries.put(entry.getPdb(), entry);
+		}
+					
+    	return pdbbindEntries;
 	}
 	
 
