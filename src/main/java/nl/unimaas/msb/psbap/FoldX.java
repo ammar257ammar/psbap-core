@@ -20,6 +20,18 @@
 
 package nl.unimaas.msb.psbap;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.apache.commons.io.FileUtils;
+
+import nl.unimaas.msb.psbap.utils.DataHandler;
+
 /**
  * A class that prepare mutation files for FoldX and generate reports after introducing mutation
  * to PDB structures
@@ -28,5 +40,64 @@ package nl.unimaas.msb.psbap;
  *
  */
 public class FoldX {
+	
+	/**
+	 * A method to generate folder structure and mutation files for FoldX
+	 * @param pdbbindPocketVariants a list of pocket variants data
+	 * @param inputPath the PdbBind entries folder path
+	 * @param outputPath the FoldX processing path
+	 * @throws IOException in case of error in IO operations
+	 */
+	public static void createMutationConfigFiles(List<String[]> pdbbindPocketVariants, String inputPath, String outputPath) throws IOException {
+		
+		Map<String, List<String[]>> mutationMap = new HashMap<String, List<String[]>>();
+		
+		for(String[] line: pdbbindPocketVariants) {
+			
+			String pdb = line[4];
+			
+			if(mutationMap.containsKey(pdb)) {
+				mutationMap.get(pdb).add(new String[] {line[7]+line[10]+line[12]+line[8]+";"});
+			}else {
+				mutationMap.put(pdb, new ArrayList<String[]>());
+				mutationMap.get(pdb).add(new String[] {line[7]+line[10]+line[12]+line[8]+";"});
+			}
+		}
+		
+		int count = 1;
+		
+		for (Entry<String, List<String[]>> entry : mutationMap.entrySet()){	
+			
+			File molFolder = new File(inputPath+entry.getKey());
+			
+			if(molFolder.isDirectory()) {
+				
+				File dir = new File(outputPath+molFolder.getName());
+				
+				boolean dirCreated = dir.mkdir();
+				
+				if(dirCreated) {
+
+					File src = new File(inputPath+molFolder.getName()+"/"+molFolder.getName()+"_protein.pdb");
+					File dst = new File(outputPath+molFolder.getName()+"/"+molFolder.getName()+"_protein.pdb");
+
+					if(src.exists()) {
+						
+						FileUtils.copyFile(src, dst);	
+						new File(outputPath+molFolder.getName()+"/input").mkdir();
+						new File(outputPath+molFolder.getName()+"/output").mkdir();
+
+						System.out.println(molFolder.getName()+ " copied");
+					}else {
+						System.out.println(molFolder.getName()+ " not copied");						
+					}
+					
+				}
+				System.out.println(entry.getKey() + " mutation list is ready " + count++);
+				DataHandler.writeDatasetToTSV(entry.getValue(), outputPath + entry.getKey() + "/input/individual_list.txt");
+			}
+			
+		}
+	}
 
 }
