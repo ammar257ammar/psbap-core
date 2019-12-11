@@ -20,9 +20,12 @@
 
 package nl.unimaas.msb.psbap;
 
+import java.io.IOException;
 import java.util.List;
 
 import nl.unimaas.msb.psbap.model.PdbBindDataset.PdbbindAttribute;
+import nl.unimaas.msb.psbap.Config;
+import nl.unimaas.msb.psbap.FoldX;
 import nl.unimaas.msb.psbap.SiftsPocketResiduesMapper;
 import nl.unimaas.msb.psbap.UniProtVariantsMapper;
 import nl.unimaas.msb.psbap.model.PdbBindDataset;
@@ -129,6 +132,44 @@ public class PSBAP
 			
 			DataHandler.writeDatasetToTSV(pdbbindPocketVariants, Config.getProperty("DATASETS_PATH") + "/pdbbind_pocket_variants.tsv", header);
 
+    		break;
+    		
+    	case "generate-foldx-mutations-and-structure":
+    		
+	    	try {
+	    		
+	    		List<String[]> pdbbindPocketVariantsForFoldX = SiftsPocketResiduesMapper.
+	    				mapPocketResidues(Config.getProperty("DATASETS_PATH") + "/pdbbind_protein_variants.tsv",
+	    								  Config.getProperty("DATASETS_PATH") + "/pdbbind_entries_data.tsv",
+	    								  "pocket");
+	    		
+				FoldX.createMutationConfigFiles(pdbbindPocketVariantsForFoldX, Config.getProperty("PDBBIND_ENTRIES_PATH"), Config.getProperty("FOLDX_PDB_DIR"));
+			
+	    	} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+    		break;
+    		
+    	case "foldx-success-report":
+    		
+    		List<String[]> repairResults2 = FoldX.getFoldxResults(Config.getProperty("FOLDX_PDB_DIR"));
+        	DataHandler.writeDatasetToTSV(repairResults2, Config.getProperty("DATASETS_PATH") + "/foldx_results.tsv");
+        	
+        	break;
+        	
+    	case "foldx-energies-report":
+    		
+    		List<String[]> mutationResults = FoldX.buildFoldxReport(Config.getProperty("FOLDX_PDB_DIR"));
+        	
+    		DataHandler.writeDatasetToTSV(mutationResults, Config.getProperty("DATASETS_PATH") + "/foldx_mutation_results.tsv", 
+        			new String[] {"PDB", "Mutation", "Energy", "SD"});
+
+    		break;
+    		
+    	case "foldx-energies-html-report":
+    		
+    
     		break;
     	}	
     }
