@@ -51,7 +51,7 @@ public class LigandTools {
 	 * A method to read a molecule file from PdbBind entry folder and parse it
 	 * as a CDK IAtomContainer
 	 * @param fname the molecule file path
-	 * @return
+	 * @return a CDK IAtomContainer
 	 */
 	public static IAtomContainer readMolandAromatizeKekulize(String fname){
 		

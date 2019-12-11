@@ -244,8 +244,8 @@ public class FoldX {
 	/**
 	 * A method to generate an HTML report from FoldX results
 	 * 
-	 * @param entriesPath
-	 * @return
+	 * @param entriesPath  of the FoldX processing folder
+	 * @return a String of the generated HTML
 	 */
 	public static String buildFoldxHtmlReport(String entriesPath) {
 		
