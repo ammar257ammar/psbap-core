@@ -73,7 +73,7 @@ public class PDBbindEntry {
 	 * @param pdb the PDB ID from the PdbBind dataset
 	 * @param parseLigand boolean to specifiy if the secondary structure information and sequence 
 	 * alignment should be performed by BioJava when parsing the PDB files
-	 * @param alignSeqAndPraseSS
+	 * @param alignSeqAndPraseSS a boolean to specify if SS and alignment should be performed
 	 */
 	public PDBbindEntry(String pdb, boolean parseLigand, boolean alignSeqAndPraseSS) {
 		
