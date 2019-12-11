@@ -20,7 +20,9 @@
 
 package nl.unimaas.msb.psbap;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -98,6 +100,69 @@ public class FoldX {
 			}
 			
 		}
+	}
+	
+
+	/**
+	 * A method to check FoldX results for the twl commands (RepairPDB and BuildModel) and report
+	 * successes and failures
+	 * 
+	 * @param entriesPath of the FoldX processing folder
+	 * @return a list of string arrays holding the results of FoldX
+	 */
+	public static List<String[]> getFoldxResults(String entriesPath) {
+		
+		File casf = new File(entriesPath);
+		File[] mols = casf.listFiles();
+		
+		List<String[]> logResults = new ArrayList<String[]>();
+		
+		System.out.println(mols.length+ " files");
+				
+		String doneRepair = "failure";
+		String doneResult = "failure";
+		
+		for(File molFolder: mols) {
+						
+			if(molFolder.isDirectory()) {
+			
+				doneRepair = "failure";
+				doneResult = "failure";
+								
+				String repairPdbPath = entriesPath+"/"+molFolder.getName()+"/input"+"/log.txt";
+				String buildModelPath = entriesPath+"/"+molFolder.getName()+"/output"+"/log.txt";					
+				
+				BufferedReader reader;
+				try {
+					reader = new BufferedReader(new FileReader(repairPdbPath));
+					String line ;
+					while ((line = reader.readLine()) != null) {
+						if(line.equals("Cleaning RepairPDB...DONE")) {
+							doneRepair = "success";
+						}
+					}
+					reader.close();
+					
+					reader = new BufferedReader(new FileReader(buildModelPath));
+					line = "";
+					while ((line = reader.readLine()) != null) {
+						if(line.equals("Cleaning BuildModel...DONE")) {
+							doneResult = "success";
+						}
+					}
+					reader.close();
+					
+					
+					logResults.add(new String[] { molFolder.getName(), doneRepair, doneResult });						
+					
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				
+			}
+			
+		}
+		return logResults;
 	}
 
 }
