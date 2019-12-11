@@ -1,5 +1,5 @@
 /**
-* binding Pocket's SNPS effect on Binding Affinity Project (PSBAP) 
+* binding Pocket's SNPs effect on Binding Affinity Project (PSBAP) 
 * 
 *Copyright (C) 2019  Ammar Ammar <ammar257ammar@gmail.com>
 *
