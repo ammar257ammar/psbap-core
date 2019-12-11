@@ -106,8 +106,6 @@ public class PDBbindEntry {
 		
 	}
 	
-	
-	
 	/**
 	 * check if the current entry has protein structure (i.e. the PDB files is parsed correctly)
 	 * @return a boolean value True or False
