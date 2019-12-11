@@ -169,7 +169,9 @@ public class PSBAP
     		
     	case "foldx-energies-html-report":
     		
-    
+    		DataHandler.writeStringToFile(FoldX.buildFoldxHtmlReport(Config.getProperty("FOLDX_PDB_DIR")), 
+    				Config.getProperty("DATASETS_PATH") + "/foldx_repor.html");
+
     		break;
     	}	
     }
