@@ -104,7 +104,7 @@ public class FoldX {
 	
 
 	/**
-	 * A method to check FoldX results for the twl commands (RepairPDB and BuildModel) and report
+	 * A method to check FoldX results for the two commands (RepairPDB and BuildModel) and report
 	 * successes and failures
 	 * 
 	 * @param entriesPath of the FoldX processing folder
@@ -159,10 +159,69 @@ public class FoldX {
 					e.printStackTrace();
 				}
 				
+			}	
+		}
+		return logResults;
+	}
+	
+
+	/**
+	 * A method to generate a report from FoldX reported energies with SD and stability index
+	 * @param entriesPath of the FoldX processing folder
+	 * @return a list of string arrays to be written to a TSV file
+	 */
+	public static List<String[]> buildFoldxReport(String entriesPath) {
+		
+		File casf = new File(entriesPath);
+		File[] mols = casf.listFiles();
+		
+		List<String[]> logResults = new ArrayList<String[]>();
+		
+		List<String> mutationList = new ArrayList<String>();
+		
+		System.out.println(mols.length+ " files");
+		
+		for(File molFolder: mols) {
+						
+			if(molFolder.isDirectory()) {
+			
+								
+				String mutationListPath = entriesPath+"/"+molFolder.getName()+"/input"+"/individual_list.txt";
+				String buildModelPath = entriesPath+"/"+molFolder.getName()+"/output"+"/Average_"+molFolder.getName()+"_protein_Repair.fxout";					
+				
+				BufferedReader reader;
+				try {
+					reader = new BufferedReader(new FileReader(mutationListPath));
+					String line ;
+					while ((line = reader.readLine()) != null) {
+						mutationList.add(line.substring(0,line.length()-1));
+					}
+					reader.close();
+					
+					if(new File(buildModelPath).exists()) {
+						reader = new BufferedReader(new FileReader(buildModelPath));
+						line = "";
+						
+						int index = 0;
+						while ((line = reader.readLine()) != null) {
+							if(line.startsWith(molFolder.getName())) {
+								String[] lineArr = line.split("\t");
+								logResults.add(new String[] {molFolder.getName(), mutationList.get(index), lineArr[2], lineArr[1] });
+								index++;
+							}
+						}
+						reader.close();
+					}
+										
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				
 			}
 			
 		}
 		return logResults;
+		
 	}
 
 }
