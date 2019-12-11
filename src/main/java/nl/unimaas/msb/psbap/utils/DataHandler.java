@@ -20,6 +20,7 @@
 
 package nl.unimaas.msb.psbap.utils;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -115,6 +116,23 @@ public class DataHandler {
 		
 		System.out.println("Number of rows: " + dataset.size());
 		System.out.println("Number of columns: " + dataset.get(0).length);
+	}
+	
+
+	/**
+	 * A method to write a string to a file
+	 * @param data is the input String
+	 * @param path where the output file should be written to
+	 */
+	public static void writeStringToFile(String data, String path) {
+		
+		try(BufferedWriter bw = new BufferedWriter(new FileWriter(new File(path)))){
+			
+			bw.write(data);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
