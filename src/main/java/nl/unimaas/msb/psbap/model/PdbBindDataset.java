@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import nl.unimaas.msb.PockerSnpBindingAffinity.model.PdbBindDataset.PdbbindAttribute;
 import nl.unimaas.msb.psbap.Config;
 
 /**
@@ -296,7 +297,7 @@ public class PdbBindDataset {
 
 	/**
 	 * A method to create a dataset of SIFTS download URLs for PdbBindDataset PDB IDs
-	 * @return  the PdbBindDataset object after grouping
+	 * @return  a list of SIFTS download URLs
 	 */
 	public List<String[]> asSiftsDownloadUrlsList(){
 		
@@ -307,6 +308,28 @@ public class PdbBindDataset {
 			String url = "http://ftp.ebi.ac.uk/pub/databases/msd/sifts/xml/" + 
 						this.pdbbindData.get(i)[PdbbindAttribute.PDB.ordinal()] + 
 						".xml.gz";
+			
+			newPdbbindData.add(new String[] {url});
+			
+		}
+				
+		return newPdbbindData;
+	}
+	
+
+	/**
+	 * A method to create a dataset of FASTA download URLs for PdbBindDataset UniProt IDs
+	 * @return  a list of FASTA download URLs
+	 */
+	public List<String[]> asFastaDownloadUrlsList(){
+		
+		List<String[]> newPdbbindData = new ArrayList<String[]>();
+
+		for(int i = 0; i < this.pdbbindData.size(); i++) {
+
+			String url = "http://www.uniprot.org/uniprot/" + 
+						this.pdbbindData.get(i)[PdbbindAttribute.UNIPROT.ordinal()] + 
+						".fasta";
 			
 			newPdbbindData.add(new String[] {url});
 			
