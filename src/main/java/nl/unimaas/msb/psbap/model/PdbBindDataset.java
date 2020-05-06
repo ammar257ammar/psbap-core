@@ -33,7 +33,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import nl.unimaas.msb.PockerSnpBindingAffinity.model.PdbBindDataset.PdbbindAttribute;
 import nl.unimaas.msb.psbap.Config;
 
 /**
@@ -330,6 +329,29 @@ public class PdbBindDataset {
 			String url = "http://www.uniprot.org/uniprot/" + 
 						this.pdbbindData.get(i)[PdbbindAttribute.UNIPROT.ordinal()] + 
 						".fasta";
+			
+			newPdbbindData.add(new String[] {url});
+			
+		}
+				
+		return newPdbbindData;
+	}
+	
+
+	/**
+	 * A method to create a dataset of DSSP download URLs for PdbBindDataset PDB IDs
+	 * @return  a list of DSSP download URLs
+	 */
+	public List<String[]> asDsspDownloadUrlsList(){
+		
+		List<String[]> newPdbbindData = new ArrayList<String[]>();
+
+		for(int i = 0; i < this.pdbbindData.size(); i++) {
+
+			String url = "http://files.rcsb.org/dssp/" +
+					this.pdbbindData.get(i)[PdbbindAttribute.PDB.ordinal()].toLowerCase().substring(1, 3) + "/" +
+					this.pdbbindData.get(i)[PdbbindAttribute.PDB.ordinal()].toLowerCase() + "/" +
+					this.pdbbindData.get(i)[PdbbindAttribute.PDB.ordinal()].toLowerCase() + ".dssp.gz";
 			
 			newPdbbindData.add(new String[] {url});
 			
