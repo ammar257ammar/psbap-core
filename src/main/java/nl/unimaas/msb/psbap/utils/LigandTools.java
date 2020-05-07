@@ -24,25 +24,34 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 
 import org.openscience.cdk.DefaultChemObjectBuilder;
+import org.openscience.cdk.aromaticity.Aromaticity;
+import org.openscience.cdk.aromaticity.ElectronDonation;
 import org.openscience.cdk.aromaticity.Kekulization;
 import org.openscience.cdk.exception.CDKException;
+import org.openscience.cdk.exception.InvalidSmilesException;
+import org.openscience.cdk.graph.CycleFinder;
+import org.openscience.cdk.graph.Cycles;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.io.Mol2Reader;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
+import org.openscience.cdk.smiles.SmilesParser;
 import org.openscience.cdk.tools.CDKHydrogenAdder;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 
 /**
- * A utility class to manipulate ligand files mainly using CDK (Mol2 and SDF formats)
+ * A utility class to manipulate ligand files mainly using CDK (Mol2 and SMILES formats)
  * 
  * @author Ammar Ammar
  *
  */
 public class LigandTools {
-
 
 	/**
 	 * A method to read a molecule from mol2 file and parse it
@@ -126,6 +135,60 @@ public class LigandTools {
 		return ac;
 	}
 	
-	
+	/**
+	 * A method to read a molecule from SMILES string file and parse it
+	 * as a CDK IAtomContainer
+	 * @param file the molecule SMILES file object
+	 * @param addHydrogens boolean if hydrogen should be added to the molecule IAtomContainer
+	 * @return a CDK IAtomContainer
+	 */
+	public static IAtomContainer readSMILESandAddHydrogens(File file, boolean addHydrogens)
+			throws IOException, ClassNotFoundException, CDKException {
+
+		List<String> lines = Files.readAllLines(Paths.get(file.getAbsolutePath()), StandardCharsets.UTF_8);
+
+		String smile = lines.get(0).substring(0, lines.get(0).indexOf("CHEMBL")).trim();
+
+		System.out.println(smile);
+		
+		SmilesParser sp = new SmilesParser(SilentChemObjectBuilder.getInstance());
+
+		IAtomContainer ac;
+		try {
+			ac = sp.parseSmiles(smile);
+		} catch (InvalidSmilesException e) {
+			System.out.println("ERROR: reading file failed!!");
+			return null;
+		}
+
+		AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(ac);
+
+		for (IAtom atom : ac.atoms())
+			atom.setImplicitHydrogenCount(0);
+
+		if (addHydrogens) {
+
+			CDKHydrogenAdder adder = CDKHydrogenAdder.getInstance(SilentChemObjectBuilder.getInstance());
+			adder.addImplicitHydrogens(ac);
+
+			AtomContainerManipulator.convertImplicitToExplicitHydrogens(ac);
+		}
+
+		ElectronDonation model = ElectronDonation.daylight();
+		CycleFinder cycles = Cycles.or(Cycles.all(), Cycles.all(6));
+		Aromaticity aromaticity = new Aromaticity(model, cycles);
+
+		aromaticity.apply(ac);
+
+		try {
+
+			Kekulization.kekulize(ac);
+
+		} catch (CDKException ex) {
+			System.out.println("kekulize failed!!");
+		}
+
+		return ac;
+	}
 
 }
