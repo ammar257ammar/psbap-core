@@ -39,6 +39,8 @@ import org.biojava.nbio.structure.GroupType;
 import org.biojava.nbio.structure.Structure;
 import org.biojava.nbio.structure.StructureException;
 import org.biojava.nbio.structure.align.util.AtomCache;
+import org.biojava.nbio.structure.asa.AsaCalculator;
+import org.biojava.nbio.structure.asa.GroupAsa;
 import org.biojava.nbio.structure.io.FileParsingParameters;
 import org.biojava.nbio.structure.io.LocalPDBDirectory.FetchBehavior;
 import org.biojava.nbio.structure.io.sifts.SiftsEntity;
@@ -500,6 +502,59 @@ public class PdbTools {
 
 			frequencyMap.put("Dominant", 3000.0);
 		}
+
+		return frequencyMap;
+	}
+	
+	/**
+	 * A method to calculate the ASA of the binding pocket and the buried/exposed residues percentages
+	 * @param pdb a path string for the pocket PDB file
+	 * @return a Hash map of the ASA of the binding pocket and the buried/exposed residues percentages
+	 */
+	public static Map<String, Double> getPocketBuriedExposedASA(String pdb) throws IOException {
+
+		Map<String, Double> frequencyMap = new HashMap<String, Double>();
+
+		PDBbindEntry pdbEntry = new PDBbindEntry(pdb, false, false);
+
+		int buriedCount = 0;
+		int exposedCount = 0;
+		int totalCount = 0;
+
+		AsaCalculator asa = new AsaCalculator(pdbEntry.getProteinStructure(), AsaCalculator.DEFAULT_PROBE_SIZE,
+				AsaCalculator.DEFAULT_N_SPHERE_POINTS, 10, false);
+
+		GroupAsa[] gasa = asa.getGroupAsas();
+
+		double asaValue = 0.0;
+
+		for (GroupAsa d : gasa) {
+
+			for (AminoAcid aa : pdbEntry.getPocketAminoAcids()) {
+
+				if (d.getGroup().getResidueNumber().toString().equals(aa.getResidueNumber().toString())) {
+
+					totalCount++;
+
+					asaValue += d.getAsaU();
+
+					double relativeASA = d.getRelativeAsaU();
+
+					if (relativeASA < 0.2) {
+						buriedCount++;
+					} else {
+						exposedCount++;
+					}
+
+					break;
+				}
+			}
+		}
+
+		frequencyMap.put("Buried", Double.valueOf(buriedCount) / Double.valueOf(totalCount));
+		frequencyMap.put("Exposed", Double.valueOf(exposedCount) / Double.valueOf(totalCount));
+		frequencyMap.put("Ratio", Double.valueOf(buriedCount) / Double.valueOf(exposedCount));
+		frequencyMap.put("PocketASA", asaValue);
 
 		return frequencyMap;
 	}
