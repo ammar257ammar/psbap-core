@@ -381,7 +381,6 @@ public class PdbTools {
 	 * @param dssp a SecStrucState list
 	 * @return a Hash map of helices and strands frequencies
 	 */
-	
 	public static Map<String, Integer> getHelixStrandFrequencyFromDSSP(List<SecStrucState> dssp) {
 
 		Map<String, Integer> frequencyMap = new HashMap<String, Integer>();
@@ -401,6 +400,39 @@ public class PdbTools {
 				Integer count = frequencyMap.get("Strand");
 				frequencyMap.put("Strand", count + 1);
 			}
+		}
+
+		return frequencyMap;
+	}
+	
+	/**
+	 * A method to calculate the percentages of Alpha Helices and Beta strands from a SecStrucState List
+	 * @param dssp a SecStrucState list
+	 * @return a Hash map of helices and strands percentages
+	 */
+	public static Map<String, Double> getHelixStrandPercentageFromDSSP(List<SecStrucState> dssp) {
+
+		Map<String, Double> frequencyMap = new HashMap<String, Double>();
+
+		frequencyMap.put("Helix", 0.0);
+		frequencyMap.put("Strand", 0.0);
+
+		for (SecStrucState state : dssp) {
+
+			if (state.getType().isHelixType()) {
+
+				Double count = frequencyMap.get("Helix");
+				frequencyMap.put("Helix", count + 1.0);
+
+			} else if (state.getType().isBetaStrand()) {
+
+				Double count = frequencyMap.get("Strand");
+				frequencyMap.put("Strand", count + 1.0);
+			}
+		}
+
+		for (Map.Entry<String, Double> entry : frequencyMap.entrySet()) {
+			frequencyMap.put(entry.getKey(), entry.getValue() / Double.valueOf(dssp.size()));
 		}
 
 		return frequencyMap;
