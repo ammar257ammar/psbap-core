@@ -197,5 +197,38 @@ public class PdbTools {
 		return srList;
 	}
 	
+	/**
+	 * A method to extract SIFTS residues from SIFTS entities list and store them in a List
+	 * @param path a string to the input file containing the SIFTS URLs to download
+	 * @param outputFolderPath a string to the output folder where SIFTS file will be downloaded
+	 * @return a String of the download command exit status (success, failure)
+	 */
+	public static String downloadSifts(String path, String outputFolderPath) throws IOException, InterruptedException {
+
+		ProcessBuilder builder = new ProcessBuilder();
+
+		builder.command("wget", "--quiet", "--no-clobber", "--retry-connrefused", "--waitretry=1", "--read-timeout=60",
+				"--timeout=60", "-t", "0", "-i", path, "-P", outputFolderPath);
+
+		Process process = builder.start();
+
+		int exitVal = process.waitFor();
+		String result = "nothing";
+
+		if (exitVal == 0) {
+			result = "SIFTS download success";
+		} else {
+			result = "SIFTS download failure";
+		}
+
+		process.destroy();
+		if (process.isAlive()) {
+			process.destroyForcibly();
+		}
+
+		return result;
+
+	}
+	
 
 }
