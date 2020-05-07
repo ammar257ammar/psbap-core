@@ -23,6 +23,9 @@ package nl.unimaas.msb.psbap.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.biojava.nbio.structure.AminoAcid;
+import org.biojava.nbio.structure.Calc;
+
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 
@@ -63,6 +66,26 @@ public class AAprops {
 		}
 
 		return header;
+	}
+	
+	/**
+	 * A method to get a list of AA neighbours of a specific amino acid within 8A radius sphere 
+	 * @param aminoAcids list of amino acids from the protein structure
+	 * @param residue the amino acid to get its neighbours
+	 * @return list of neighbour residues
+	 */
+	public static List<AminoAcid> getResidueNeighbours(List<AminoAcid> aminoAcids, AminoAcid residue) {
+
+		List<AminoAcid> neighbours = new ArrayList<AminoAcid>();
+
+		for (AminoAcid aa : aminoAcids) {
+
+			if (Calc.getDistance(residue.getCA(), aa.getCA()) <= 8.0) {
+				neighbours.add(aa);
+			}
+		}
+
+		return neighbours;
 	}
 
 }
