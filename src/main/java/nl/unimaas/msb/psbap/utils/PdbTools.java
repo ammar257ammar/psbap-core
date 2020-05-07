@@ -558,6 +558,26 @@ public class PdbTools {
 
 		return frequencyMap;
 	}
+
+	
+	/**
+	 * A method to get the secondary structure of a residue by its number
+	 * @param dssp a SecStrucState list
+	 * @param snpResidueNumber the residue number as integer
+	 * @return a String of the secondary structure type of the provided residue
+	 */
+	public static String getSnpSecStruc(List<SecStrucState> dssp, int snpResidueNumber) {
+
+		String annotation = "";
+		for (SecStrucState state : dssp) {
+
+			if (state.getGroup().getResidueNumber().getSeqNum().equals(snpResidueNumber)) {
+				annotation = state.getType().name;
+			}
+		}
+
+		return annotation;
+	}
 	
 
 }
