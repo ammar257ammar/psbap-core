@@ -609,5 +609,36 @@ public class PdbTools {
 		return annotation;
 	}
 	
+	/**
+	 * A method to get the ASA a residue by its number
+	 * @param path a path string to the PDB of the protein
+	 * @param residueNumber the residue number as String
+	 * @return a Double value of the ASA of the provided residue
+	 */
+	public static Double getResidueASA(String path, String residueNumber) throws IOException {
+
+		PDBFileReader reader = PdbTools.configureReader(false);
+
+		Structure proteinStructure = reader.getStructure(path);
+
+		AsaCalculator asa = new AsaCalculator(proteinStructure, AsaCalculator.DEFAULT_PROBE_SIZE,
+				AsaCalculator.DEFAULT_N_SPHERE_POINTS, 10, false);
+
+		GroupAsa[] gasa = asa.getGroupAsas();
+
+		double asaValue = 0.0;
+
+		for (GroupAsa d : gasa) {
+
+			if (d.getGroup().getResidueNumber().toString().equals(residueNumber)) {
+
+				asaValue = d.getRelativeAsaU();
+				break;
+			}
+		}
+
+		return asaValue;
+	}
+	
 
 }
