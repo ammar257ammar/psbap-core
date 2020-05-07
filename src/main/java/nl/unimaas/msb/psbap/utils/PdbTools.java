@@ -579,5 +579,35 @@ public class PdbTools {
 		return annotation;
 	}
 	
+	/**
+	 * A method to check if secondary structure of a residue is a Helix or a Strand
+	 * @param dssp a SecStrucState list
+	 * @param snpResidueNumber the residue number as integer
+	 * @return a String of the secondary structure (Helix or Strand) of the provided residue
+	 */
+	public static String getSnpHelixOrStrand(List<SecStrucState> dssp, int snpResidueNumber) {
+
+		String annotation = "";
+		for (SecStrucState state : dssp) {
+
+			if (state.getGroup().getResidueNumber().getSeqNum().equals(snpResidueNumber)) {
+
+				if (state.getType().isHelixType()) {
+
+					annotation = "Helix";
+
+				} else if (state.getType().isBetaStrand()) {
+
+					annotation = "Strand";
+
+				} else {
+					annotation = "Other";
+				}
+			}
+		}
+
+		return annotation;
+	}
+	
 
 }
