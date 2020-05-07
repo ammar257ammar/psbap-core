@@ -330,5 +330,26 @@ public class PdbTools {
 		return null;
 	}
 	
+	/**
+	 * A method to count DSSP secondary structures per type from a SecStrucState List
+	 * @param dssp a SecStrucState list
+	 * @return a Hash map of secondary structures frequency per type
+	 */
+	public static Map<String, Integer> getSecStructFrequencyFromDSSP(List<SecStrucState> dssp) {
+
+		Map<String, Integer> frequencyMap = new HashMap<String, Integer>();
+
+		for (SecStrucState state : dssp) {
+
+			Integer count = frequencyMap.get(state.getType().name);
+			if (count == null)
+				count = 0;
+
+			frequencyMap.put(state.getType().name, count + 1);
+		}
+
+		return frequencyMap;
+	}
+	
 
 }
