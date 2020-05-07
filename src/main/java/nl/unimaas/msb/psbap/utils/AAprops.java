@@ -20,6 +20,11 @@
 
 package nl.unimaas.msb.psbap.utils;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.univocity.parsers.csv.CsvParser;
+import com.univocity.parsers.csv.CsvParserSettings;
 
 /**
  * A utility class to use 48 amino acid properties in creating features for AA residues and their surrounding
@@ -32,5 +37,32 @@ package nl.unimaas.msb.psbap.utils;
 public class AAprops {
 		
 	
+	/**
+	 * create a header from the AA properties names in the resource CSV file
+	 * @return the header as a list of strings
+	 */
+	public static List<String> getAApropsHeader() {
+
+		List<String> header = new ArrayList<String>();
+
+		CsvParserSettings settings = new CsvParserSettings();
+
+		settings.getFormat().setLineSeparator("\n");
+		settings.getFormat().setDelimiter(',');
+
+		settings.setNumberOfRowsToSkip(1);
+
+		CsvParser parser = new CsvParser(settings);
+
+		List<String[]> rows = parser.parseAll(AAprops.class.getClass().getClassLoader().getResourceAsStream("/AAprops.csv"));
+		
+
+		for (String[] row : rows) {
+
+			header.add(row[0]);
+		}
+
+		return header;
+	}
 
 }
