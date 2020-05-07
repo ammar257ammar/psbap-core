@@ -31,8 +31,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.biojava.nbio.core.util.InputStreamProvider;
 import org.biojava.nbio.structure.AminoAcid;
+import org.biojava.nbio.structure.Calc;
 import org.biojava.nbio.structure.Chain;
 import org.biojava.nbio.structure.Group;
 import org.biojava.nbio.structure.GroupType;
@@ -640,5 +642,57 @@ public class PdbTools {
 		return asaValue;
 	}
 	
+	/**
+	 * A method to calculate the Phi/Psi dihedral angles of a residue by its number
+	 * @param path a path string to the PDB of the protein
+	 * @param residueNumber the residue number as String
+	 * @return a Pair object of Phi/Psi values for the provided residue
+	 */
+	public static Pair<Double, Double> getResiduePhiPsi(String path, String residueNumber)
+			throws IOException, StructureException {
+
+		PDBFileReader reader = PdbTools.configureReader(false);
+
+		Structure proteinStructure = reader.getStructure(path);
+
+		List<AminoAcid> aminoAcids = PdbTools.getAminoAcidsFromStructure(proteinStructure);
+
+		double phi = 360.0;
+		double psi = 360.0;
+
+		AminoAcid a = null;
+		AminoAcid b = null;
+		AminoAcid c = null;
+
+		for (int i = 0; i < aminoAcids.size(); i++) {
+
+			if (aminoAcids.get(i).getResidueNumber().toString().equals(residueNumber)) {
+
+				b = aminoAcids.get(i);
+
+				if (i > 0) {
+					a = aminoAcids.get(i - 1);
+					try {
+						phi = Calc.getPhi(a, b);
+					} catch (StructureException e) {
+						e.printStackTrace();
+						phi = 360.0;
+					}
+				}
+				if (i < aminoAcids.size() - 1) {
+					c = aminoAcids.get(i + 1);
+					try {
+						psi = Calc.getPsi(b, c);
+					} catch (StructureException e) {
+						e.printStackTrace();
+						psi = 360.0;
+					}
+				}
+				break;
+			}
+		}
+
+		return Pair.of(phi, psi);
+	}	
 
 }
