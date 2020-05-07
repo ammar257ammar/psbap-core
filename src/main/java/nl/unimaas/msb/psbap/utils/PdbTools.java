@@ -376,5 +376,35 @@ public class PdbTools {
 		return frequencyMap;
 	}
 	
+	/**
+	 * A method to calculate the frequency of Alpha Helices and Beta strands from a SecStrucState List
+	 * @param dssp a SecStrucState list
+	 * @return a Hash map of helices and strands frequencies
+	 */
+	
+	public static Map<String, Integer> getHelixStrandFrequencyFromDSSP(List<SecStrucState> dssp) {
+
+		Map<String, Integer> frequencyMap = new HashMap<String, Integer>();
+
+		frequencyMap.put("Helix", 0);
+		frequencyMap.put("Strand", 0);
+
+		for (SecStrucState state : dssp) {
+
+			if (state.getType().isHelixType()) {
+
+				Integer count = frequencyMap.get("Helix");
+				frequencyMap.put("Helix", count + 1);
+
+			} else if (state.getType().isBetaStrand()) {
+
+				Integer count = frequencyMap.get("Strand");
+				frequencyMap.put("Strand", count + 1);
+			}
+		}
+
+		return frequencyMap;
+	}
+	
 
 }
