@@ -102,6 +102,30 @@ public class LigandTools {
 		return ac;
 	}
 	
+
+	/**
+	 * A method to read a molecule from mol2 String path and parse it
+	 * as a CDK IAtomContainer
+	 * @param file a String for the molecule file path
+	 * @param addHydrogens boolean if hydrogen should be added to the molecule IAtomContainer
+	 * @return a CDK IAtomContainer
+	 */
+	public static IAtomContainer readMol2andAddHydrogens(String file, boolean addHydrogens) {
+		
+		IAtomContainer ac = null;
+		try {
+			ac = readMol2andAddHydrogens(new File(file), addHydrogens);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (CDKException e) {
+			e.printStackTrace();
+		}
+		
+		return ac;
+	}
+	
 	
 
 }
