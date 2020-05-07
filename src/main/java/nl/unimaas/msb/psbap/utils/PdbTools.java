@@ -438,5 +438,71 @@ public class PdbTools {
 		return frequencyMap;
 	}
 	
+	/**
+	 * A method to calculate the dominant secondary structure in the binding pocket from a SecStrucState List
+	 * @param dssp a SecStrucState list
+	 * @param pdb a path string for the pocket PDB file
+	 * @return a Hash map of secondary structure frequencies and the dominant one
+	 */
+	public static Map<String, Double> getPocketHelixStrandPercentageFromDSSP(List<SecStrucState> dssp, String pdb) {
+
+		Map<String, Double> frequencyMap = new HashMap<String, Double>();
+
+		PDBbindEntry pdbEntry = new PDBbindEntry(pdb, false, false);
+
+		frequencyMap.put("Helix", 0.0);
+		frequencyMap.put("Strand", 0.0);
+		frequencyMap.put("Other", 0.0);
+
+		int pocketRescount = 0;
+
+		for (SecStrucState state : dssp) {
+
+			for (AminoAcid aa : pdbEntry.getProteinAminoAcids()) {
+
+				if (state.getGroup().getResidueNumber().getSeqNum().equals(aa.getResidueNumber().getSeqNum())) {
+
+					pocketRescount++;
+					
+					if (state.getType().isHelixType()) {
+
+						Double count = frequencyMap.get("Helix");
+						frequencyMap.put("Helix", count + 1.0);
+
+					} else if (state.getType().isBetaStrand()) {
+
+						Double count = frequencyMap.get("Strand");
+						frequencyMap.put("Strand", count + 1.0);
+
+					} else {
+						Double count = frequencyMap.get("Other");
+						frequencyMap.put("Other", count + 1.0);
+					}
+
+					break;
+				}
+			}
+		}
+
+		for (Map.Entry<String, Double> entry : frequencyMap.entrySet()) {
+			frequencyMap.put(entry.getKey(), entry.getValue() / Double.valueOf(pocketRescount));
+		}
+
+		if (frequencyMap.get("Helix") > frequencyMap.get("Strand") && frequencyMap.get("Helix") > frequencyMap.get("Other")){
+
+			frequencyMap.put("Dominant", 1000.0);
+
+		}else if (frequencyMap.get("Strand") > frequencyMap.get("Other")){
+
+			frequencyMap.put("Dominant", 2000.0);
+
+		}else{
+
+			frequencyMap.put("Dominant", 3000.0);
+		}
+
+		return frequencyMap;
+	}
+	
 
 }
