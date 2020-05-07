@@ -351,5 +351,30 @@ public class PdbTools {
 		return frequencyMap;
 	}
 	
+	/**
+	 * A method to calculate the percentage of DSSP secondary structures per type from a SecStrucState List
+	 * @param dssp a SecStrucState list
+	 * @return a Hash map of secondary structures percentages per type
+	 */
+	public static Map<String, Double> getSecStructPercentageFromDSSP(List<SecStrucState> dssp) {
+
+		Map<String, Double> frequencyMap = new HashMap<String, Double>();
+
+		for (SecStrucState state : dssp) {
+
+			Double count = frequencyMap.get(state.getType().name);
+			if (count == null)
+				count = 0.0;
+
+			frequencyMap.put(state.getType().name, count + 1.0);
+		}
+
+		for (Map.Entry<String, Double> entry : frequencyMap.entrySet()) {
+			frequencyMap.put(entry.getKey(), entry.getValue() / Double.valueOf(dssp.size()));
+		}
+
+		return frequencyMap;
+	}
+	
 
 }
