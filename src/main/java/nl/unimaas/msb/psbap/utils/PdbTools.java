@@ -263,4 +263,38 @@ public class PdbTools {
 	}
 	
 
+	/**
+	 * A method to download FASTA files from URLs provided in a file
+	 * @param path a string to the input file containing the FASTA URLs to download
+	 * @param outputFolderPath a string to the output folder where FASTA file will be downloaded
+	 * @return a String of the download command exit status (success, failure)
+	 */
+	public static String downloadFasta(String path, String outputFolderPath) throws IOException, InterruptedException {
+		
+		ProcessBuilder builder = new ProcessBuilder();
+				
+		builder.command("wget", "--quiet", "--no-clobber","--retry-connrefused","--waitretry=1","--read-timeout=60",
+				"--timeout=60","-t","0","-i",path,"-P",outputFolderPath);
+
+		Process process = builder.start();
+		
+	    int exitVal = process.waitFor();
+	    String result = "nothing";
+	    
+		if (exitVal == 0) {
+			result = "FASTA download success";
+		} else {
+			result = "FASTA download failure";
+		}
+	    
+		process.destroy();
+		if (process.isAlive()) {
+		    process.destroyForcibly();
+		}	
+				
+		return result;
+		
+	}
+	
+
 }
