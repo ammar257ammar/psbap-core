@@ -23,10 +23,13 @@ package nl.unimaas.msb.psbap.utils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
 
 import org.biojava.nbio.core.util.InputStreamProvider;
 import org.biojava.nbio.structure.AminoAcid;
@@ -34,6 +37,7 @@ import org.biojava.nbio.structure.Chain;
 import org.biojava.nbio.structure.Group;
 import org.biojava.nbio.structure.GroupType;
 import org.biojava.nbio.structure.Structure;
+import org.biojava.nbio.structure.StructureException;
 import org.biojava.nbio.structure.align.util.AtomCache;
 import org.biojava.nbio.structure.io.FileParsingParameters;
 import org.biojava.nbio.structure.io.LocalPDBDirectory.FetchBehavior;
@@ -41,6 +45,9 @@ import org.biojava.nbio.structure.io.sifts.SiftsEntity;
 import org.biojava.nbio.structure.io.sifts.SiftsResidue;
 import org.biojava.nbio.structure.io.sifts.SiftsSegment;
 import org.biojava.nbio.structure.io.sifts.SiftsXMLParser;
+import org.biojava.nbio.structure.secstruc.DSSPParser;
+import org.biojava.nbio.structure.secstruc.SecStrucCalc;
+import org.biojava.nbio.structure.secstruc.SecStrucState;
 
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
@@ -293,7 +300,34 @@ public class PdbTools {
 		}	
 				
 		return result;
-		
+	}
+	
+	/**
+	 * A method to extract DSSP secondary structures from DSSP file and store them in a List
+	 * @param path a path string to the DSSP file
+	 * @param pdb a path string to the PDB file
+	 * @return a list of DSSP secondary structures
+	 */
+	public static List<SecStrucState> getDsspForPDB(String path, String pdb) throws IOException, StructureException {
+
+		PDBbindEntry entry = new PDBbindEntry(pdb, false, false);
+		Structure s = entry.getProteinStructure();
+
+		URL url = Paths.get(path).toUri().toURL();
+
+		InputStream in = new GZIPInputStream(url.openStream());
+
+		SecStrucCalc ssp = new SecStrucCalc();
+		try {
+			return ssp.calculate(s, true);
+		} catch (StructureException e) {
+			try {
+				return DSSPParser.parseInputStream(in, s, true);
+			} catch (Exception bige) {
+				System.out.println(bige);
+			}
+		}
+		return null;
 	}
 	
 
