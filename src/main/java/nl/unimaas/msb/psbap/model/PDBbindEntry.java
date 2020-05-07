@@ -95,7 +95,8 @@ public class PDBbindEntry {
 		}
 		 
 		if(parseLigand){
-			this.ligandStructure  = LigandTools.readMolandAromatizeKekulize(Config.getProperty("PDBBIND_ENTRIES_PATH")+"/"+pdb+"/"+pdb+"_ligand.mol2");			
+			this.ligandStructure = LigandTools.readMol2andAddHydrogens(
+					Config.getProperty("PDBBIND_ENTRIES_PATH") + "/" + pdb + "/" + pdb + "_ligand.mol2", true);
 		}
 		
 		this.siftEntities = PdbTools.getSiftsEntitiesForPDB(Config.getProperty("SIFTS_PATH"), pdb);
