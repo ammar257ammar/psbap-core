@@ -20,9 +20,11 @@
 
 package nl.unimaas.msb.psbap;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -30,11 +32,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.jooq.lambda.Seq;
+import org.jooq.lambda.tuple.Tuple2;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.io.iterator.IteratingSDFReader;
 
 import com.google.common.io.Files;
+import com.univocity.parsers.tsv.TsvParser;
+import com.univocity.parsers.tsv.TsvParserSettings;
 
 import nl.unimaas.msb.psbap.model.PdbBindDataset;
 import nl.unimaas.msb.psbap.model.PdbBindDataset.PdbbindAttribute;
@@ -214,6 +220,87 @@ public class Ligand3D {
 		similarLigands = Ligand3D.getLigandsIDsFiltered(similarLigands);
 
 		return similarLigands;
+	}
+
+	
+	/**
+	 * A method to combine ligands information with Tanimoto similarity
+	 * @param ligandsPath the OpenBabel-selected ligands folder path
+	 * @param idsFile ligands IDs file
+	 * @throws IOException in case of error in IO operations
+	 * @throws FileNotFoundException in case file not found
+	 * @return a list of string arrays holding the filtered ligands names, IDs and Tanimoto similarity 
+	 */
+	public static List<String[]> combineIDsAndTanimotoOfLigands(String ligandsPath, String idsFile)
+			throws FileNotFoundException, IOException {
+
+		List<String[]> ligandsDataset = new ArrayList<String[]>();
+
+		List<String[]> logsDataset = new ArrayList<String[]>();
+
+		File casf = new File(ligandsPath);
+		File[] mols = casf.listFiles();
+
+		for (File molFolder : mols) {
+			if (molFolder.isDirectory()) {
+
+				File logsFolder = new File(molFolder.getAbsolutePath() + "/logs");
+
+				if (logsFolder.exists()) {
+
+					File[] logs = logsFolder.listFiles();
+
+					for (File log : logs) {
+
+						try (BufferedReader reader = new BufferedReader(new FileReader(log))) {
+							String line;
+							boolean moleculeDefined = false;
+							String molecule = "";
+
+							while ((line = reader.readLine()) != null) {
+
+								if (line.startsWith(">")) {
+
+									if (!moleculeDefined) {
+										molecule = line.substring(1, 5);
+										moleculeDefined = true;
+									} else {
+
+										logsDataset.add(new String[] { molFolder.getName(), molecule,
+												line.substring(1, line.indexOf("Tanimoto")).trim(),
+												line.substring(line.lastIndexOf("=") + 1, line.length()).trim() });
+									}
+								}
+							}
+						} // try
+
+					} // for logs
+				} // if log exists
+			}
+		} // for molecules in /pdb
+
+		TsvParserSettings settings = new TsvParserSettings();
+		settings.getFormat().setLineSeparator("\n");
+
+		TsvParser parser = new TsvParser(settings);
+
+		List<String[]> rows = parser.parseAll(new File(idsFile));
+
+		Seq<String[]> seqLogs = Seq.seq(logsDataset);
+
+		Seq<String[]> seqIds = Seq.seq(rows);
+
+		List<Tuple2<String[], String[]>> joinDataset = seqIds
+				.leftOuterJoin(seqLogs, (t, u) -> t[0].equals(u[0]) && t[2].equals(u[2])).collect(Collectors.toList());
+
+		for (Tuple2<String[], String[]> tuple : joinDataset) {
+			ligandsDataset.add(new String[] { tuple.v1[0], tuple.v1[1], tuple.v1[2], tuple.v2[3] });
+		}
+
+		ligandsDataset = Ligand3D.getLigandsIDsFiltered(ligandsDataset);
+
+		return ligandsDataset;
+
 	}
 
 }
