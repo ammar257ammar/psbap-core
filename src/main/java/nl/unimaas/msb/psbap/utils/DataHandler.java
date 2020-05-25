@@ -103,7 +103,11 @@ public class DataHandler {
 	 */
 	public static void printDatasetHead(List<String[]> dataset) {
 		
-		printDatasetHead(dataset, 10);
+		if(dataset.size() < 10) {
+			printDatasetHead(dataset, dataset.size());
+		}else {
+			printDatasetHead(dataset, 10);
+		}
 	
 	}
 	
