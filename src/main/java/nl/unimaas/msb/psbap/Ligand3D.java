@@ -36,7 +36,6 @@ import org.openscience.cdk.io.iterator.IteratingSDFReader;
 
 import com.google.common.io.Files;
 
-import nl.unimaas.msb.PockerSnpBindingAffinity.Config;
 import nl.unimaas.msb.psbap.model.PdbBindDataset;
 import nl.unimaas.msb.psbap.model.PdbBindDataset.PdbbindAttribute;
 
@@ -197,6 +196,22 @@ public class Ligand3D {
 
 			it.remove();
 		}
+
+		return similarLigands;
+	}
+	
+	/**
+	 * A wrapper method to extract ChEMBL IDs from the similar ligands and remove duplicates
+	 * @param ligandsPath the OpenBabel-selected ligands folder path
+	 * @throws IOException in case of error in IO operations
+	 * @throws FileNotFoundException in case file not found
+	 * @return a list of string arrays holding the filtered ligands names and IDs 
+	 */
+	public static List<String[]> getLigandsIDsFiltered(String ligandsPath) throws FileNotFoundException, IOException {
+
+		List<String[]> similarLigands = Ligand3D.getLigandIDsFromFiles(ligandsPath);
+
+		similarLigands = Ligand3D.getLigandsIDsFiltered(similarLigands);
 
 		return similarLigands;
 	}
