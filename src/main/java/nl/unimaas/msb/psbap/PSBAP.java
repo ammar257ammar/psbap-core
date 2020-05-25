@@ -132,9 +132,6 @@ public class PSBAP
     		DataHandler.writeDatasetToTSV(mutationResults, Config.getProperty("DATASETS_PATH") + "/foldx_mutation_results.tsv", 
         			new String[] {"PDB", "Mutation", "Energy", "SD"});
     		
-    		DataHandler.writeStringToFile(FoldX.buildFoldxHtmlReport(Config.getProperty("FOLDX_PDB_DIR")), 
-    				Config.getProperty("DATASETS_PATH") + "/foldx_repor.html");
-    		
         	break;
         	
     	}	
