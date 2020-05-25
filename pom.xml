@@ -69,6 +69,12 @@
 	    <artifactId>commons-lang3</artifactId>
 	    <version>3.9</version>
 	</dependency>
+	
+	<dependency>
+	    <groupId>org.jooq</groupId>
+	    <artifactId>jool</artifactId>
+	    <version>0.9.12</version>
+	</dependency>
   </dependencies>
   
   <build>
