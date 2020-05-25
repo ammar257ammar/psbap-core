@@ -20,6 +20,15 @@
 
 package nl.unimaas.msb.psbap;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
+import com.google.common.io.Files;
+
+import nl.unimaas.msb.psbap.model.PdbBindDataset;
+import nl.unimaas.msb.psbap.model.PdbBindDataset.PdbbindAttribute;
+
 
 /**
  * A class to prepare ligands folder structure and prepare a dataset of ligands ChEMBL IDs and Tanimoto similarities
@@ -30,5 +39,54 @@ package nl.unimaas.msb.psbap;
 public class Ligand3D {
 	
 	
+	/**
+	 * A method to generate folder structure and ligands files for OpenBabel
+	 * @param foldxPath the path for FoldX folder where selected PDBbind entries reside
+	 * @param pdbEntriesPath the PdbBind entries folder path to get the original ligands files
+	 * @param output the ligands output folder to be used by OpenBabel
+	 * @throws IOException in case of error in IO operations
+	 */
+	public static void prepareLigandsFolder(String foldxPath, String pdbEntriesPath, String output)
+			throws IOException {
+
+		PdbBindDataset pdbbindData = PdbBindDataset.create().loadData()
+				.filterStringNotEqual(PdbbindAttribute.UNIPROT, "------")
+				.filterStringNotEqual(PdbbindAttribute.RESOLUTION, "NMR").sortBy(PdbbindAttribute.RESOLUTION)
+				.filterDoubleCutoff(PdbbindAttribute.RESOLUTION, 2.51).keepAsFolderMatch()
+				.groupByUniProtAndKeepMinResolution(true);
+
+		File casf = new File(foldxPath);
+		File[] mols = casf.listFiles();
+
+		List<String[]> pdbbindDataset = pdbbindData.getData();
+
+		for (File molFolder : mols) {
+			if (molFolder.isDirectory()) {
+
+				for (String[] row : pdbbindDataset) {
+					if (row[0].equals(molFolder.getName())) {
+
+						String[] ligands = row[2].split(";");
+
+						for (String ligand : ligands) {
+
+							String[] ligandArr = ligand.split(":");
+
+							new File(output + "/" + row[0]).mkdir();
+
+							File ligandSrc = new File(
+									pdbEntriesPath + "/" + ligandArr[0] + "/" + ligandArr[0] + "_ligand.sdf");
+							File ligandDest = new File(output + "/" + row[0] + "/" + ligandArr[0] + "_ligand.sdf");
+
+							Files.copy(ligandSrc, ligandDest);
+
+							System.out.println("File copied: " + ligandArr[0]);
+
+						}
+					}
+				}
+			}
+		}
+	}
 
 }
