@@ -22,6 +22,7 @@ package nl.unimaas.msb.psbap;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -53,7 +54,7 @@ public class SiftsPocketResiduesMapper {
 	 * @param mappingType wich is wither "protein" or "pocket"
 	 * @return a dataset as list of string arrays
 	 */
-	public static List<String[]> mapPocketResidues(String path, String pdbbindEntriesFile, String mappingType){
+	public static List<String[]> mapPocketResidues(String path, String pdbbindEntriesFile, String mappingType, boolean unique){
 
     	CsvParserSettings settings = new CsvParserSettings();
 		
@@ -65,6 +66,8 @@ public class SiftsPocketResiduesMapper {
 		List<String[]> rows = parser.parseAll(new File(path));
 		
 		List<String[]> pdbVariantsRows = new ArrayList<String[]>();
+		
+		Map<String, String> mutationMap = new HashMap<String, String>();
 						
 		Map<String, PDBbindEntry> pdbbindEntries = PdbTools.parsePDBbindEntriesFromFile(pdbbindEntriesFile);
 						
@@ -101,7 +104,7 @@ public class SiftsPocketResiduesMapper {
 		    					
 				for(AminoAcid aa: aaList) {
 					
-					for(SiftsResidue res: pbEntry.getSiftResidues())
+					for(SiftsResidue res: pbEntry.getSiftResidues()) {
 		            	
 	                    if(res.getPdbResName().equals(aa.getPDBName()) && 
 	                       res.getPdbResNum().equals(aa.getResidueNumber().getSeqNum().toString()) &&
@@ -150,11 +153,32 @@ public class SiftsPocketResiduesMapper {
 	                    	pdbTempRow.add((res.getNaturalPos() != null) ? res.getNaturalPos().toString() : "");
 	            			
 	                    	if(pdbTempRow.get(7).equals(pdbTempRow.get(13)) && pdbTempRow.get(7).equals(pdbTempRow.get(15)) && !pdbTempRow.get(8).equals("")) {
-	                    		pdbVariantsRows.add(pdbTempRow.toArray(new String[pdbTempRow.size()]));
-	                    	}
-						}
-					}
-				}
+
+        						String[] resultArr = pdbTempRow.toArray(new String[pdbTempRow.size()]);
+
+	                    		if(unique) {
+	        						
+	        						String pdbId = resultArr[4].trim();
+	        						String mutation = resultArr[7].trim()+resultArr[10].trim()+resultArr[12].trim()+resultArr[8].trim()+";";
+	        						
+	        						if(!mutationMap.containsKey(pdbId+"_"+mutation)) {
+	        							
+	        							mutationMap.put(pdbId+"_"+mutation,"");
+	        							
+	        							pdbVariantsRows.add(resultArr);
+
+	        						}
+
+	        					}else {
+
+	        						pdbVariantsRows.add(resultArr);
+
+	        					}// if(unique) {
+	                    	} // if(pdbTempRow.get(7)
+	                    }// if(res.getPdbResName().equals(aa.getPDBName())
+					}// for(SiftsResidue res: pbEntry.getSiftResidues())
+				}// for(AminoAcid aa: aaList) {
+			}
 		}
 			
     	return pdbVariantsRows;

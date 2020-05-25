@@ -76,7 +76,7 @@ public class PSBAP
 	    	
     		DataHandler.writeDatasetToTSV(pdbbindVariants, Config.getProperty("DATASETS_PATH") + "/pdbbind_protein_variants.tsv");  	
 	    	
-    		System.gc();
+    		System.gc(); 
     		
     		break;
     		
@@ -85,7 +85,7 @@ public class PSBAP
     		List<String[]> pdbbindPocketVariants = SiftsPocketResiduesMapper.
     				mapPocketResidues(Config.getProperty("DATASETS_PATH") + "/pdbbind_protein_variants.tsv",
     								  Config.getProperty("DATASETS_PATH") + "/pdbbind_entries_data.tsv",
-    								  "pocket");
+    								  "pocket", true);
 
     		String[] header = new String[]{"gene_name",
 											"uniprot",
