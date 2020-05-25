@@ -21,8 +21,16 @@
 package nl.unimaas.msb.psbap;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import org.openscience.cdk.DefaultChemObjectBuilder;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.io.iterator.IteratingSDFReader;
 
 import com.google.common.io.Files;
 
@@ -87,6 +95,57 @@ public class Ligand3D {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * A method to extract ChEMBL IDs from the similar ligands SDF files selected with OpenBabel
+	 * @param ligandsPath the OpenBabel-selected ligands folder path
+	 * @throws IOException in case of error in IO operations
+	 * @throws FileNotFoundException in case file not found
+	 */
+	public static List<String[]> getLigandIDsFromFiles(String ligandsPath) throws FileNotFoundException, IOException {
+
+		List<String[]> ligandsDataset = new ArrayList<String[]>();
+
+		File casf = new File(ligandsPath);
+		File[] mols = casf.listFiles();
+
+		for (File molFolder : mols) {
+			if (molFolder.isDirectory()) {
+
+				File splitted = new File(molFolder.getAbsolutePath() + "/results");
+
+				if (splitted.exists()) {
+
+					File[] similarLigands = splitted.listFiles();
+
+					for (File similarLigand : similarLigands) {
+
+						int index = 1;
+
+						try (IteratingSDFReader reader = new IteratingSDFReader(new FileInputStream(similarLigand),
+								DefaultChemObjectBuilder.getInstance())) {
+
+							while (reader.hasNext()) {
+
+								IAtomContainer ac = (IAtomContainer) reader.next();
+
+								for (Map.Entry<Object, Object> entry : ac.getProperties().entrySet()) {
+									if (entry.getKey().equals("chembl_id")) {
+										ligandsDataset.add(new String[] { molFolder.getName(),
+												similarLigand.getName().substring(0,
+														similarLigand.getName().lastIndexOf(".")) + "_" + index++,
+												entry.getValue().toString() });
+									}
+								}
+
+							}
+						}
+					}
+				}
+			}
+		}
+		return ligandsDataset;
 	}
 
 }
