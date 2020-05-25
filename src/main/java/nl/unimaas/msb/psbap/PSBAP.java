@@ -46,7 +46,7 @@ public class PSBAP
     	
     	switch(cli.operation){
     	
-    	case "generate-pdbbind-dataset":
+    	case "init":
     		
     		PdbBindDataset pdbbindData = PdbBindDataset.create().
 											loadData().
@@ -60,40 +60,19 @@ public class PSBAP
     	    DataHandler.writeDatasetToTSV(pdbbindData.getData(), Config.getProperty("DATASETS_PATH") + "/pdbbind_entries_data.tsv");
 
     	    DataHandler.printDatasetStats(pdbbindData.getData());
-
     	    DataHandler.printDatasetHead(pdbbindData.getData());
-    	    
-			break;
-			
-    	case "generate-sifts-urls":
-    				
-    		PdbBindDataset pdbbindDataForSifts = PdbBindDataset.create().
-											loadData().
-											filterStringNotEqual(PdbbindAttribute.UNIPROT, "------").
-											filterStringNotEqual(PdbbindAttribute.RESOLUTION, "NMR").
-											sortBy(PdbbindAttribute.RESOLUTION).
-											keepAsFolderMatch().
-											filterDoubleCutoff(PdbbindAttribute.RESOLUTION, 2.51).
-											groupByUniProtAndKeepMinResolution(true);
 
-        	List<String[]> pdbbindDataSiftsUrls = pdbbindDataForSifts.asSiftsDownloadUrlsList();    	
-        	
+    	    List<String[]> pdbbindDataSiftsUrls = pdbbindData.asSiftsDownloadUrlsList();    	  	
         	DataHandler.writeDatasetToTSV(pdbbindDataSiftsUrls, Config.getProperty("DATASETS_PATH") + "/pdbbind_sifts_urls.tsv");
+
+    	    List<String[]> pdbbindDataFastaUrls = pdbbindData.asFastaDownloadUrlsList();    	  	
+        	DataHandler.writeDatasetToTSV(pdbbindDataFastaUrls, Config.getProperty("DATASETS_PATH") + "/pdbbind_fasta_urls.tsv");
     		
-    		break;
+    	    List<String[]> pdbbindDataDsspUrls = pdbbindData.asDsspDownloadUrlsList();    	  	
+        	DataHandler.writeDatasetToTSV(pdbbindDataDsspUrls, Config.getProperty("DATASETS_PATH") + "/pdbbind_dssp_urls.tsv");
     		
-    	case "map-uniprot-variant-to-proteins":
-    		
-    		PdbBindDataset pdbbindDataForVariants = PdbBindDataset.create().
-													loadData().
-													filterStringNotEqual(PdbbindAttribute.UNIPROT, "------").
-													filterStringNotEqual(PdbbindAttribute.RESOLUTION, "NMR").
-													sortBy(PdbbindAttribute.RESOLUTION).
-													keepAsFolderMatch().
-													filterDoubleCutoff(PdbbindAttribute.RESOLUTION, 2.51).
-													groupByUniProtAndKeepMinResolution(true);
-    		
-    		List<String[]> pdbbindVariants = UniProtVariantsMapper.mapMissenseVariantsToPdbbindDataset(pdbbindDataForVariants.getData());
+
+        	List<String[]> pdbbindVariants = UniProtVariantsMapper.mapMissenseVariantsToPdbbindDataset(pdbbindData.getData());
 	    	
     		DataHandler.writeDatasetToTSV(pdbbindVariants, Config.getProperty("DATASETS_PATH") + "/pdbbind_protein_variants.tsv");  	
 	    	
@@ -101,14 +80,14 @@ public class PSBAP
     		
     		break;
     		
-    	case "map-pocket-residues-to-uniprot-variants":
-
+    	case "pocket-snps-mapping-and-foldx-prep":
+    		
     		List<String[]> pdbbindPocketVariants = SiftsPocketResiduesMapper.
-			mapPocketResidues(Config.getProperty("DATASETS_PATH") + "/pdbbind_protein_variants.tsv",
-							  Config.getProperty("DATASETS_PATH") + "/pdbbind_entries_data.tsv",
-							  "pocket");
+    				mapPocketResidues(Config.getProperty("DATASETS_PATH") + "/pdbbind_protein_variants.tsv",
+    								  Config.getProperty("DATASETS_PATH") + "/pdbbind_entries_data.tsv",
+    								  "pocket");
 
-			String[] header = new String[]{"gene_name",
+    		String[] header = new String[]{"gene_name",
 											"uniprot",
 											"snp",
 											"rs_id",
@@ -129,50 +108,35 @@ public class PSBAP
 											"PdbId",
 											"SeqResName",
 											"NaturalPos"};
-			
-			DataHandler.writeDatasetToTSV(pdbbindPocketVariants, Config.getProperty("DATASETS_PATH") + "/pdbbind_pocket_variants.tsv", header);
+    				
+    		DataHandler.writeDatasetToTSV(pdbbindPocketVariants, Config.getProperty("DATASETS_PATH") + "/pdbbind_pocket_variants.tsv", header);
 
-    		break;
-    		
-    	case "generate-foldx-mutations-and-structure":
-    		
-	    	try {
+
+    		try {
 	    		
-	    		List<String[]> pdbbindPocketVariantsForFoldX = SiftsPocketResiduesMapper.
-	    				mapPocketResidues(Config.getProperty("DATASETS_PATH") + "/pdbbind_protein_variants.tsv",
-	    								  Config.getProperty("DATASETS_PATH") + "/pdbbind_entries_data.tsv",
-	    								  "pocket");
-	    		
-				FoldX.createMutationConfigFiles(pdbbindPocketVariantsForFoldX, Config.getProperty("PDBBIND_ENTRIES_PATH"), Config.getProperty("FOLDX_PDB_DIR"));
+    			FoldX.createMutationConfigFiles(pdbbindPocketVariants, Config.getProperty("PDBBIND_ENTRIES_PATH"), Config.getProperty("FOLDX_PDB_DIR"));
 			
 	    	} catch (IOException e) {
 				e.printStackTrace();
 			}
 
-    		break;
-    		
-    	case "foldx-success-report":
+			break;
+					
+    	case "foldx-report":
     		
     		List<String[]> repairResults2 = FoldX.getFoldxResults(Config.getProperty("FOLDX_PDB_DIR"));
         	DataHandler.writeDatasetToTSV(repairResults2, Config.getProperty("DATASETS_PATH") + "/foldx_results.tsv");
         	
-        	break;
-        	
-    	case "foldx-energies-report":
-    		
     		List<String[]> mutationResults = FoldX.buildFoldxReport(Config.getProperty("FOLDX_PDB_DIR"));
         	
     		DataHandler.writeDatasetToTSV(mutationResults, Config.getProperty("DATASETS_PATH") + "/foldx_mutation_results.tsv", 
         			new String[] {"PDB", "Mutation", "Energy", "SD"});
-
-    		break;
-    		
-    	case "foldx-energies-html-report":
     		
     		DataHandler.writeStringToFile(FoldX.buildFoldxHtmlReport(Config.getProperty("FOLDX_PDB_DIR")), 
     				Config.getProperty("DATASETS_PATH") + "/foldx_repor.html");
-
-    		break;
+    		
+        	break;
+        	
     	}	
     }
 }

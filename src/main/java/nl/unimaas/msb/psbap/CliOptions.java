@@ -37,7 +37,7 @@ public class CliOptions {
 	@Option(names = {"-h", "-?", "--help" }, usageHelp = true, description = "Display a help message")
 	boolean help = false;
 
-	@Option(names = {"-op", "--operation"}, description = "select an operation to perform: generate-pdbbind-dataset, print-pdbbind-head", required = true)
+	@Option(names = {"-op", "--operation"}, description = "select an operation to perform: init, pocket-snps-mapping-and-foldx-prep, foldx-report", required = true)
 	String operation = "";
 
 	CliOptions(String[] args) {
