@@ -71,7 +71,7 @@ public class SiftsPocketResiduesMapper {
 		for (String[] row: rows){
 						
 			String pdb = row[4];
-			String snp = row[2];
+			String snp = row[1];
 			
 			PDBbindEntry pbEntry = pdbbindEntries.get(pdb);
 			
