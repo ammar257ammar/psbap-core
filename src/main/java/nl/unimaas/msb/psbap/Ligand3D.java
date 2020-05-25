@@ -25,8 +25,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -34,6 +36,7 @@ import org.openscience.cdk.io.iterator.IteratingSDFReader;
 
 import com.google.common.io.Files;
 
+import nl.unimaas.msb.PockerSnpBindingAffinity.Config;
 import nl.unimaas.msb.psbap.model.PdbBindDataset;
 import nl.unimaas.msb.psbap.model.PdbBindDataset.PdbbindAttribute;
 
@@ -102,6 +105,7 @@ public class Ligand3D {
 	 * @param ligandsPath the OpenBabel-selected ligands folder path
 	 * @throws IOException in case of error in IO operations
 	 * @throws FileNotFoundException in case file not found
+	 * @return a list of string arrays holding the ligands file names and IDs
 	 */
 	public static List<String[]> getLigandIDsFromFiles(String ligandsPath) throws FileNotFoundException, IOException {
 
@@ -146,6 +150,55 @@ public class Ligand3D {
 			}
 		}
 		return ligandsDataset;
+	}
+	
+	/**
+	 * A method to remove duplicated ligands from a selected ChEMBL IDs list
+	 * @param similarLigands the OpenBabel-selected ligands list
+	 * @return a list of string arrays holding the filtered ligands names and IDs 
+	 */
+	public static List<String[]> getLigandsIDsFiltered(List<String[]> similarLigands) {
+
+		Map<Object, List<String[]>> map = similarLigands.stream().collect(Collectors.groupingBy(line -> line[0]));
+
+		similarLigands.clear();
+
+		Iterator<?> it = map.entrySet().iterator();
+
+		while (it.hasNext()) {
+
+			@SuppressWarnings("unchecked")
+			Map.Entry<String, List<String[]>> pair = (Map.Entry<String, List<String[]>>) it.next();
+
+			List<String[]> ligandAndRes = (List<String[]>) pair.getValue();
+
+			Map<Object, List<String[]>> map2 = ligandAndRes.stream().collect(Collectors.groupingBy(line -> line[2]));
+
+			Iterator<?> it2 = map2.entrySet().iterator();
+
+			while (it2.hasNext()) {
+
+				@SuppressWarnings("unchecked")
+				Map.Entry<String, List<String[]>> pair2 = (Map.Entry<String, List<String[]>>) it2.next();
+
+				List<String[]> ligandAndRes2 = (List<String[]>) pair2.getValue();
+
+				String[] ligandAndResMin = ligandAndRes2.get(0);
+				ligandAndRes2.remove(0);
+
+				for (String[] row : ligandAndRes2) {
+					new File(Config.getProperty("LIGANDS_PATH") + "/" + row[0] + "/splitted/" + row[1]).delete();
+				}
+
+				similarLigands.add(ligandAndResMin);
+
+				it2.remove(); // avoids a ConcurrentModificationException
+			}
+
+			it.remove();
+		}
+
+		return similarLigands;
 	}
 
 }
