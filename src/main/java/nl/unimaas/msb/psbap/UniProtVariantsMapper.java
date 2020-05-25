@@ -76,7 +76,6 @@ public class UniProtVariantsMapper {
 					        			row[PdbbindAttribute.RESOLUTION.ordinal()],
 					        			row[PdbbindAttribute.LIGAND.ordinal()]
 					        			});
-			        			break;
 			        		}
 			        	}
 			        }	    
