@@ -20,26 +20,10 @@
 
 package nl.unimaas.msb.psbap;
 
-import static j2html.TagCreator.attrs;
-import static j2html.TagCreator.body;
-import static j2html.TagCreator.div;
-import static j2html.TagCreator.h2;
-import static j2html.TagCreator.h3;
-import static j2html.TagCreator.h4;
-import static j2html.TagCreator.head;
-import static j2html.TagCreator.html;
-import static j2html.TagCreator.style;
-import static j2html.TagCreator.table;
-import static j2html.TagCreator.td;
-import static j2html.TagCreator.title;
-import static j2html.TagCreator.tr;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,7 +32,6 @@ import java.util.Map.Entry;
 
 import org.apache.commons.io.FileUtils;
 
-import j2html.tags.ContainerTag;
 import nl.unimaas.msb.psbap.utils.DataHandler;
 
 /**
@@ -237,6 +220,7 @@ public class FoldX {
 			}
 			
 		}
+		
 		return logResults;
 	}
 
