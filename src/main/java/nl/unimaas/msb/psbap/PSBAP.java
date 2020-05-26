@@ -134,6 +134,34 @@ public class PSBAP
     		
         	break;
         	
+    	case "prepare-ligands-folders":
+    		
+        	try {
+				Ligand3D.prepareLigandsFolder(Config.getProperty("FOLDX_PDB_DIR"), 
+						Config.getProperty("PDBBIND_ENTRIES_PATH"), 
+						Config.getProperty("LIGANDS_PATH"));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+        	
+        	break;
+        	
+    	case "ligands-tanimoto-dataset":
+    		    		
+			try {
+				List<String[]> similarLigands = Ligand3D.getLigandsIDsFiltered(Config.getProperty("LIGANDS_PATH"));
+	        	DataHandler.writeDatasetToTSV(similarLigands, 
+	        			Config.getProperty("DATASETS_PATH") + "/chembl_ligands_filtered.tsv");
+
+	        	List<String[]> ligandsWithIDsAndTanimoto = Ligand3D.combineIDsAndTanimotoOfLigands(Config.getProperty("LIGANDS_PATH"), 
+	        			Config.getProperty("DATASETS_PATH") + "/chembl_ligands_filtered.tsv");
+	        	
+	        	DataHandler.writeDatasetToTSV(ligandsWithIDsAndTanimoto, 
+	        			Config.getProperty("DATASETS_PATH") + "/chembl_ligands_filtered_combined_tanimoto.tsv");
+	        	
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
     	}	
     }
 }
