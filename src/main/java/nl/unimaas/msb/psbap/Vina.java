@@ -20,7 +20,9 @@
 
 package nl.unimaas.msb.psbap;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +39,7 @@ import org.biojava.nbio.structure.StructureImpl;
 import org.biojava.nbio.structure.StructureTools;
 import org.biojava.nbio.structure.io.PDBFileReader;
 
+import nl.unimaas.msb.PockerSnpBindingAffinity.Vina;
 import nl.unimaas.msb.psbap.model.PDBbindEntry;
 import nl.unimaas.msb.psbap.utils.PdbTools;
 
@@ -331,5 +334,94 @@ public class Vina {
     	
     	return grid;
 	}
+	
+	
+
+	/**
+	 * A method to generate Vina docking config for PDBbind entries
+	 * @param entriesPath the path of the selected PDBbind entries
+	 * @param replace a boolean to choose if the config file should be replaced if exists
+	 * @throws IOException in case of error in IO operations
+	 */
+	public static void createConfigFilesAfterLigandsStructure(String entriesPath, boolean replace) throws IOException {
+		
+		File entries = new File(entriesPath);
+		File[] mols = entries.listFiles();
+		
+		System.out.println(mols.length+ " files");
+		
+		for(File molFolder: mols) {
+			if(molFolder.isDirectory()) {
+				
+				File molVarsFolder = new File(entriesPath + molFolder.getName()+"/proteins");
+				File[] molVars = molVarsFolder.listFiles();
+				
+				for(File molVarFolder: molVars) {
+					
+					if(molVarFolder.isDirectory()) {
+						
+						File configFile = new File(entriesPath+"/"+molFolder.getName()+"/proteins/" + molVarFolder.getName() +"/"+ molVarFolder.getName()+"_config.txt");
+						
+						if(replace) {
+						
+							List<double[]> grid = Vina.calculateVinaGridEnhanced(molFolder.getName(),entriesPath+"/"+molFolder.getName()+"/proteins/" + molVarFolder.getName() +"/"+ molVarFolder.getName()+"_final.pdb");
+							
+							String gridBox =    "center_x = "+grid.get(2)[0]+"\n" + 
+								    			"center_y = "+grid.get(2)[1]+"\n" + 
+								    			"center_z = "+grid.get(2)[2]+"\n" + 
+								    			"\n" + 
+								    			"size_x = "+(int) grid.get(3)[0]+"\n" + 
+								    			"size_y = "+(int) grid.get(3)[1]+"\n" + 
+								    			"size_z = "+(int) grid.get(3)[2]+"\n\n";
+							
+							String technical =  "cpu = 12\n" + 
+												"num_modes = 3\n" + 
+												"energy_range = 2\n" + 
+												"exhaustiveness = 12\n";
+							
+							
+							try (BufferedWriter writer = new BufferedWriter(new FileWriter(configFile))) 
+							{
+								writer.write(gridBox);
+								writer.write(technical);
+							}
+							System.out.println(molVarFolder.getName()+ " config written!!");
+							
+						}else {
+							
+							if(!configFile.exists()) {
+								
+								List<double[]> grid = Vina.calculateVinaGridEnhanced(molFolder.getName(),entriesPath+"/"+molFolder.getName()+"/proteins/" + molVarFolder.getName() +"/"+ molVarFolder.getName()+"_final.pdb");
+								
+								String gridBox =    "center_x = "+grid.get(2)[0]+"\n" + 
+									    			"center_y = "+grid.get(2)[1]+"\n" + 
+									    			"center_z = "+grid.get(2)[2]+"\n" + 
+									    			"\n" + 
+									    			"size_x = "+(int) grid.get(3)[0]+"\n" + 
+									    			"size_y = "+(int) grid.get(3)[1]+"\n" + 
+									    			"size_z = "+(int) grid.get(3)[2]+"\n\n";
+								
+								String technical =  "cpu = 12\n" + 
+													"num_modes = 3\n" + 
+													"energy_range = 2\n" + 
+													"exhaustiveness = 12\n";
+								
+								
+								try (BufferedWriter writer = new BufferedWriter(new FileWriter(configFile))) 
+								{
+									writer.write(gridBox);
+									writer.write(technical);
+								}
+								System.out.println(molVarFolder.getName()+ " config written!!");
+							}
+						}
+						
+					}
+				}
+			}	
+		}
+	}
+	
+	
 
 }
