@@ -208,5 +208,26 @@ public class Vina {
 			}
 		}
 	}
+	
+
+	/**
+	 * A method to generate ligands folder structure for AutoDock Vina for all PDBbind entry
+	 * @param vinaPath the AutoDock Vina folder being prepared docking
+	 * @param ligandsPath the path for ligands prepared in a previous step
+	 * @param minimized a boolean value to choose if the minimized ligands should be used or the original ones
+	 * @throws IOException in case of error in IO operations
+	 */
+	public static void createLigandsStructureAfterVinaFolder(String vinaPath, String ligandsPath, boolean minimized) throws IOException {
+		
+		File entries = new File(vinaPath);
+		File[] mols = entries.listFiles();
+		
+		for(File molFolder: mols) {
+			if(molFolder.isDirectory()) {
+				
+				Vina.createLigandsStructureAfterVinaFolderSingle(vinaPath, molFolder.getName(), ligandsPath, minimized);	
+			}
+		}
+	}
 
 }
