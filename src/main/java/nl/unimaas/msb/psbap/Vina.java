@@ -24,6 +24,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,6 +42,7 @@ import org.biojava.nbio.structure.StructureTools;
 import org.biojava.nbio.structure.io.PDBFileReader;
 
 import nl.unimaas.msb.psbap.model.PDBbindEntry;
+import nl.unimaas.msb.psbap.utils.DataHandler;
 import nl.unimaas.msb.psbap.utils.PdbTools;
 
 /**
@@ -472,6 +475,94 @@ public class Vina {
 				}
 			}	
 		}
+	}
+	
+	/**
+	 * A method to generate Vina report with binding affinities extracted from all dockings results
+	 * @param entriesPath the path of the selected PDBbind entries
+	 * @param outputPath the output file name prefix (two TSV files will be generated, one of them contains "-df" added to the prefix)
+	 * @param pdb the PdbBind entry protein
+	 * @throws IOException in case of error in IO operations
+	 */
+	public static void generateVinaReport(String entriesPath, String outputPath, String pdb) throws IOException {
+		
+		File entries = new File(entriesPath);
+		File[] mols = entries.listFiles();
+		
+		System.out.println(mols.length+ " files");
+		
+		boolean headerAdded = false;
+		
+		List<String[]> bindingResults = new ArrayList<String[]>();
+		List<String[]> bindingResultsDf = new ArrayList<String[]>();
+		
+		List<String> bindingResultsDfHeader = new ArrayList<String>();
+				
+		File molVarsFolder = new File(entriesPath+pdb+"/proteins");
+		File[] molVars = molVarsFolder.listFiles();
+						
+		for(File molVarFolder: molVars) {
+			
+			if(molVarFolder.isDirectory()) {
+				
+				ArrayList<String> varLine = new ArrayList<String>();
+				
+				varLine.add(molVarFolder.getName());
+				
+				if(!headerAdded) {
+					bindingResultsDfHeader.add("Varaint");									
+				}
+				
+				File molLigandsFolder = new File(entriesPath+pdb+"/proteins/"+molVarFolder.getName()+"/vina");
+				File[] molLigands = molLigandsFolder.listFiles();
+				
+				System.out.println(molVarFolder.getName()+ " files");
+
+				for(File molLigand: molLigands) {
+					
+					File dockingLog = new File(entriesPath+pdb+"/proteins/"+molVarFolder.getName()+"/vina/"+molLigand.getName()+"/"+molLigand.getName()+"_min_log.txt");
+					
+					
+					if(dockingLog.exists()) {
+						
+						List<String> dockingResults = Files.readAllLines(Paths.get(entriesPath+pdb+"/proteins/"+molVarFolder.getName()+"/vina/"+molLigand.getName()+"/"+molLigand.getName()+"_min_log.txt"));
+							
+						String bindingAffinity = "";
+						
+						for(String line: dockingResults) {
+							if(line.startsWith("   1")) {
+								bindingAffinity = line.substring(8, 22).trim();
+								
+								bindingResults.add(new String[] {pdb, molVarFolder.getName(), molLigand.getName(), bindingAffinity});
+								
+								varLine.add(bindingAffinity);
+							}
+						}
+						
+						if(bindingAffinity.equals("") || bindingAffinity == null) {
+							varLine.add("-");
+						}
+						
+					}else {
+						varLine.add("-");
+					}
+					
+					if(!headerAdded) {
+						bindingResultsDfHeader.add(molLigand.getName());									
+					}
+				} // for(File molLigandsLog: molLigandsLogs)
+				
+				bindingResultsDf.add(varLine.toArray(new String[varLine.size()]));
+				
+				headerAdded = true;
+			}
+		}
+
+		bindingResultsDf.add(0, bindingResultsDfHeader.toArray(new String[bindingResultsDfHeader.size()]));
+		
+		DataHandler.writeDatasetToTSV(bindingResults, outputPath+".tsv");
+		DataHandler.writeDatasetToTSV(bindingResultsDf, outputPath+"_df.tsv");
+		
 	}
 
 }
