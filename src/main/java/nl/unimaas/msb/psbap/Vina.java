@@ -22,14 +22,19 @@ package nl.unimaas.msb.psbap;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.vecmath.Point3d;
 
 import org.apache.commons.io.FileUtils;
 import org.biojava.nbio.structure.AminoAcid;
+import org.biojava.nbio.structure.Atom;
 import org.biojava.nbio.structure.Chain;
 import org.biojava.nbio.structure.ChainImpl;
 import org.biojava.nbio.structure.Structure;
 import org.biojava.nbio.structure.StructureImpl;
+import org.biojava.nbio.structure.StructureTools;
 import org.biojava.nbio.structure.io.PDBFileReader;
 
 import nl.unimaas.msb.psbap.model.PDBbindEntry;
@@ -272,6 +277,59 @@ public class Vina {
     	s.addChain(c);
     	
 		return s;
+	}
+	
+	/**
+	 * A method to generate Vina grid box config from the binding pocket of PDBbind entry protein after minimization
+	 * @param pdb the PdbBind entry protein
+	 * @param finalPDBPath the path of the minimzed PDB (wild-type or mutation)
+	 * @throws IOException in case of error in IO operations
+	 */
+	public static List<double[]> calculateVinaGridEnhanced(String pdb, String finalPDBPath) throws IOException{
+
+		Structure pocketStructure = Vina.getPocketForModifiedPDBbindStructure(pdb, finalPDBPath);
+
+    	double minX = 1000.0;
+    	double minY = 1000.0;
+    	double minZ = 1000.0;
+    	
+    	double maxX = 0.0;
+    	double maxY = 0.0;
+    	double maxZ = 0.0;
+		
+    	Atom[] pocketAtoms = StructureTools.getAllAtomArray(pocketStructure);
+		
+		for(Atom atom: pocketAtoms){
+			
+			Point3d p = atom.getCoordsAsPoint3d();
+
+			if(p.x < minX)	minX = p.x;
+			
+			if(p.y < minY)  minY = p.y;
+			
+			if(p.z < minZ)	minZ = p.z;
+			
+			if(p.x > maxX)	maxX = p.x;
+
+			if(p.y > maxY)	maxY = p.y;
+
+			if(p.z > maxZ)	maxZ = p.z;
+		}
+		
+		List<double[]> grid = new ArrayList<double[]>();
+    	
+    	grid.add(new double[]{minX , minY , minZ});
+    	grid.add(new double[]{maxX , maxY , maxZ});
+    	
+    	grid.add(new double[]{(Math.round((((maxX + minX)/2)*1000.0)))/1000.0,
+    						  (Math.round((((maxY + minY)/2)*1000.0)))/1000.0,
+    						  (Math.round((((maxZ + minZ)/2)*1000.0)))/1000.0});
+    	
+    	grid.add(new double[]{(int)(Math.ceil(maxX - minX)),
+			    			  (int)(Math.ceil(maxY - minY)),
+			    			  (int)(Math.ceil(maxZ - minZ))});
+    	
+    	return grid;
 	}
 
 }
