@@ -22,9 +22,18 @@ package nl.unimaas.msb.psbap;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.biojava.nbio.structure.AminoAcid;
+import org.biojava.nbio.structure.Chain;
+import org.biojava.nbio.structure.ChainImpl;
+import org.biojava.nbio.structure.Structure;
+import org.biojava.nbio.structure.StructureImpl;
+import org.biojava.nbio.structure.io.PDBFileReader;
 
+import nl.unimaas.msb.psbap.model.PDBbindEntry;
+import nl.unimaas.msb.psbap.utils.PdbTools;
 
 /**
  * A class to prepare AutoDock Vina folder structure and prepare the grid box and extract binding affinities from docking results
@@ -79,7 +88,6 @@ public class Vina {
 			}
 		}	
 	}
-	
 
 	/**
 	 * A method to generate folder structure for AutoDock Vina from Gromacs EM results folders
@@ -102,7 +110,6 @@ public class Vina {
 			}
 		}
 	}
-	
 	
 	/**
 	 * A method to generate ligands folder structure for AutoDock Vina for single PDBbind entry
@@ -209,7 +216,6 @@ public class Vina {
 		}
 	}
 	
-
 	/**
 	 * A method to generate ligands folder structure for AutoDock Vina for all PDBbind entry
 	 * @param vinaPath the AutoDock Vina folder being prepared docking
@@ -228,6 +234,44 @@ public class Vina {
 				Vina.createLigandsStructureAfterVinaFolderSingle(vinaPath, molFolder.getName(), ligandsPath, minimized);	
 			}
 		}
+	}
+
+	/**
+	 * A method to generate a BioJava Structure from the binding pocket of PDBbind entry protein after minimization
+	 * @param pdb the PdbBind entry protein
+	 * @param finalPDBPath the path of the minimzed PDB (wild-type or mutation)
+	 * @throws IOException in case of error in IO operations
+	 */
+	public static Structure getPocketForModifiedPDBbindStructure(String pdb, String finalPDBPath) throws IOException{
+		
+		PDBbindEntry pdbEntry = new PDBbindEntry(pdb, false, false);
+
+		PDBFileReader reader = PdbTools.configureReader(false);
+
+		Structure proteinStructure = reader.getStructure(finalPDBPath);
+		
+		List<AminoAcid> proteinAAlist = PdbTools.getAminoAcidsFromStructure(proteinStructure);
+
+		Structure s = new StructureImpl();
+
+		Chain c = new ChainImpl();
+    	
+    	for(AminoAcid aa : pdbEntry.getPocketAminoAcids()){
+    		
+    		for (AminoAcid aap : proteinAAlist) {
+    			
+    			if(aa.getResidueNumber().toString().equals(aap.getResidueNumber().toString())) {
+
+    				c.addGroup(aap);
+
+    				break;
+    			}		
+    		}
+    	}
+    	
+    	s.addChain(c);
+    	
+		return s;
 	}
 
 }
