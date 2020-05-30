@@ -25,6 +25,7 @@ import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
 
+
 /**
  * A class to prepare AutoDock Vina folder structure and prepare the grid box and extract binding affinities from docking results
  * 
@@ -77,6 +78,29 @@ public class Vina {
 				
 			}
 		}	
+	}
+	
+
+	/**
+	 * A method to generate folder structure for AutoDock Vina from Gromacs EM results folders
+	 * @param gromacsPath the path for Gromacs folder where EM took place
+	 * @param vinaPath the AutoDock Vina folder being prepared docking
+	 * @throws IOException in case of error in IO operations
+	 */
+	public static void createFolderStructureFromGromacsFolder(String gromacsPath, String vinaPath) throws IOException {
+		
+		File entries = new File(gromacsPath);
+		File[] mols = entries.listFiles();
+		
+		System.out.println(mols.length+ " files");
+				
+		for(File molFolder: mols) {
+			if(molFolder.isDirectory()) {
+				
+				Vina.createFolderStructureFromGromacsOneFolder(gromacsPath, molFolder.getName(), vinaPath);
+				
+			}
+		}
 	}
 
 }
