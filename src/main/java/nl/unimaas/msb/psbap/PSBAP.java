@@ -162,6 +162,26 @@ public class PSBAP
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+
+			break;
+        	
+    	case "prepare-vina-folders-config":
+    		
+    		try {
+    			Vina.createFolderStructureFromGromacsFolder(Config.getProperty("FOLDX_PDB_DIR"), Config.getProperty("VINA_DOCKING_DIR"));
+
+    			Vina.createLigandsStructureAfterVinaFolder(Config.getProperty("VINA_DOCKING_DIR"), Config.getProperty("LIGANDS_PATH"), true);
+
+    			Vina.createSeedFilesAfterLigandsStructure(Config.getProperty("VINA_DOCKING_DIR"), "1264647227", false);
+
+    			Vina.createConfigFilesAfterLigandsStructure(Config.getProperty("VINA_DOCKING_DIR"),false);       		
+       		
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+    		
+    		
+    		break;
     	}	
     }
 }
