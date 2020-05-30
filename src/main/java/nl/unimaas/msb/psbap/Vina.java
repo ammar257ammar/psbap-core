@@ -102,5 +102,111 @@ public class Vina {
 			}
 		}
 	}
+	
+	
+	/**
+	 * A method to generate ligands folder structure for AutoDock Vina for single PDBbind entry
+	 * @param vinaPath the AutoDock Vina folder being prepared docking
+	 * @param pdb the PdbBind entry
+	 * @param ligandsPath the path for ligands prepared in a previous step
+	 * @param minimized a boolean value to choose if the minimized ligands should be used or the original ones
+	 * @throws IOException in case of error in IO operations
+	 */
+	public static void createLigandsStructureAfterVinaFolderSingle(String vinaPath, String pdb, String ligandsPath, boolean minimized) throws IOException {
+
+		File ligandsDir = new File(vinaPath+pdb+"/ligands");
+		
+		if(!ligandsDir.exists()) {
+			ligandsDir.mkdir();
+		}
+		
+		File molVarsFolder = new File(vinaPath+pdb+"/proteins");
+		File[] molVars = molVarsFolder.listFiles();
+						
+		for(File molVarFolder: molVars) {
+			
+			if(molVarFolder.isDirectory()) {
+				
+				String varVinaFolder = vinaPath+pdb+"/proteins/"+molVarFolder.getName();
+				
+				File dir = new File(varVinaFolder+"/vina");
+				
+				boolean dirCreated = dir.mkdir();
+				
+				if(dirCreated || dir.exists()) {
+					
+					File ligandsFoldersDir = new File(ligandsPath+pdb+"/splitted");
+					File[] ligandsFiles = ligandsFoldersDir.listFiles();
+					
+					for(File ligandsFile: ligandsFiles) {
+						
+						if(minimized) {
+							
+							if(ligandsFile.getName().contains("_min")) {
+								
+								String ligandDockingFolderName = ligandsFile.getName().substring(0, ligandsFile.getName().length()-9); 
+							
+								File ligandDockingFolder = new File(varVinaFolder+"/vina/"+ligandDockingFolderName);
+								
+								boolean ligandDockingFolderCreated = ligandDockingFolder.mkdir();
+								
+								if(ligandDockingFolderCreated || ligandDockingFolder.exists()) {
+								
+									File srcLigand = new File(ligandsPath+pdb+"/splitted/"+ligandsFile.getName());
+									File dstLigand = new File(vinaPath+pdb+"/ligands/"+ligandsFile.getName());
+									
+									if(srcLigand.exists()) {
+										
+										FileUtils.copyFile(srcLigand, dstLigand);
+										
+										System.out.println(ligandsFile.getName() + " Ligand copied");
+									
+									}else {
+										System.out.println(srcLigand.getName()+ " ligand file not copied #####################################");						
+									}
+									
+								}else {
+									System.out.println(ligandDockingFolderName+ " Ligand folder cannot be created!!");						
+								}
+									
+							} // if(ligandsFile.getName().contains("_min")) {
+							
+						}else {
+							
+							if(!ligandsFile.getName().contains("_min")) {
+								
+								String ligandDockingFolderName = ligandsFile.getName().substring(0, ligandsFile.getName().length()-5); 
+							
+								File ligandDockingFolder = new File(varVinaFolder+"/vina/"+ligandDockingFolderName);
+								
+								boolean ligandDockingFolderCreated = ligandDockingFolder.mkdir();
+								
+								if(ligandDockingFolderCreated || ligandDockingFolder.exists()) {
+								
+									File srcLigand = new File(ligandsPath+pdb+"/splitted/"+ligandsFile.getName());
+									File dstLigand = new File(vinaPath+pdb+"/ligands/"+ligandDockingFolderName+"_min.mol2");
+									
+									if(srcLigand.exists()) {
+										
+										FileUtils.copyFile(srcLigand, dstLigand);
+										
+										System.out.println(ligandsFile.getName() + " Ligand copied");
+									
+									}else {
+										System.out.println(srcLigand.getName()+ " ligand file not copied #####################################");						
+									}
+									
+								}else {
+									System.out.println(ligandDockingFolderName+ " Ligand folder cannot be created!!");						
+								}
+									
+							} // if(ligandsFile.getName().contains("_min")) {
+							
+						}
+					} // for(File ligandsFile: ligandsFiles) {			
+				}
+			}
+		}
+	}
 
 }
