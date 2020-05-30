@@ -39,7 +39,6 @@ import org.biojava.nbio.structure.StructureImpl;
 import org.biojava.nbio.structure.StructureTools;
 import org.biojava.nbio.structure.io.PDBFileReader;
 
-import nl.unimaas.msb.PockerSnpBindingAffinity.Vina;
 import nl.unimaas.msb.psbap.model.PDBbindEntry;
 import nl.unimaas.msb.psbap.utils.PdbTools;
 
@@ -422,6 +421,57 @@ public class Vina {
 		}
 	}
 	
-	
+
+	/**
+	 * A method to generate Vina seed file for all dockings
+	 * @param entriesPath the path of the selected PDBbind entries
+	 * @param seed the seed string to be used
+	 * @param replace a boolean to choose if the config file should be replaced if exists
+	 * @throws IOException in case of error in IO operations
+	 */
+	public static void createSeedFilesAfterLigandsStructure(String entriesPath, String seed, boolean replace) throws IOException {
+		
+		File entries = new File(entriesPath);
+		File[] mols = entries.listFiles();
+		
+		System.out.println(mols.length+ " files");
+		
+		for(File molFolder: mols) {
+			if(molFolder.isDirectory()) {
+				
+				File molVarsFolder = new File(entriesPath + molFolder.getName()+"/proteins");
+				File[] molVars = molVarsFolder.listFiles();
+				
+				for(File molVarFolder: molVars) {
+					
+					if(molVarFolder.isDirectory()) {
+						
+						File seedFile = new File(entriesPath+"/"+molFolder.getName()+"/proteins/" + molVarFolder.getName() +"/"+ molVarFolder.getName()+"_seed.txt");
+						
+						if(replace) {
+							
+							try (BufferedWriter writer = new BufferedWriter(new FileWriter(seedFile))) 
+							{
+								writer.write(seed);
+							}
+							System.out.println(molVarFolder.getName()+ " seed written!!");
+							
+						}else {
+							
+							if(!seedFile.exists()) {
+								
+								try (BufferedWriter writer = new BufferedWriter(new FileWriter(seedFile))) 
+								{
+									writer.write(seed);
+								}
+								System.out.println(molVarFolder.getName()+ " seed written!!");
+								
+							}
+						}		
+					}
+				}
+			}	
+		}
+	}
 
 }
