@@ -20,7 +20,6 @@
 
 package nl.unimaas.msb.psbap.utils;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,15 +42,10 @@ import com.univocity.parsers.csv.CsvParserSettings;
  * 
  */
 public class AAprops {
-		
+			
+	List<String[]> rows = null;
 	
-	/**
-	 * create a header from the AA properties names in the resource CSV file
-	 * @return the header as a list of strings
-	 */
-	public static List<String> getAApropsHeader() {
-
-		List<String> header = new ArrayList<String>();
+	public AAprops() {
 
 		CsvParserSettings settings = new CsvParserSettings();
 
@@ -61,16 +55,26 @@ public class AAprops {
 		settings.setNumberOfRowsToSkip(1);
 
 		CsvParser parser = new CsvParser(settings);
-
-		List<String[]> rows = parser.parseAll(AAprops.class.getClass().getClassLoader().getResourceAsStream("/AAprops.csv"));
 		
+        this.rows = parser.parseAll(getClass().getResourceAsStream("/aaprops.csv"));	   
+	}
+	
+	/**
+	 * create a header from the AA properties names in the resource CSV file
+	 * @return the header as a list of strings
+	 */
+	public List<String> getAApropsHeader() {
 
-		for (String[] row : rows) {
+		List<String> header = new ArrayList<String>();
+
+
+		for (String[] row : this.rows) {
 
 			header.add(row[0]);
 		}
 
 		return header;
+		
 	}
 	
 	/**
@@ -79,7 +83,7 @@ public class AAprops {
 	 * @param residue the amino acid to get its neighbours
 	 * @return list of neighbour residues
 	 */
-	public static List<AminoAcid> getResidueNeighbours(List<AminoAcid> aminoAcids, AminoAcid residue) {
+	public List<AminoAcid> getResidueNeighbours(List<AminoAcid> aminoAcids, AminoAcid residue) {
 
 		List<AminoAcid> neighbours = new ArrayList<AminoAcid>();
 
@@ -101,7 +105,7 @@ public class AAprops {
 	 * @param WT the wild-type residue name
 	 * @return list of 96 double values (48 for residue properties, 48 for surrounding properties)
 	 */
-	public static List<Double> getResidueAndSurroundingProps(String path, String residueNumber, String WT) throws IOException{
+	public List<Double> getResidueAndSurroundingProps(String path, String residueNumber, String WT) throws IOException{
 		
 		List<Double> props = new ArrayList<Double>();
 		List<Double> nbProps = new ArrayList<Double>();
@@ -140,20 +144,9 @@ public class AAprops {
 				
 				AminoAcid residue = aminoAcids.get(i);
 				
-				CsvParserSettings settings = new CsvParserSettings();
+				List<AminoAcid> neighbours = this.getResidueNeighbours(aminoAcids, residue);
 
-				settings.getFormat().setLineSeparator("\n");
-				settings.getFormat().setDelimiter(',');
-
-				settings.setNumberOfRowsToSkip(1);
-				
-				CsvParser parser = new CsvParser(settings);
-
-				List<String[]> rows = parser.parseAll(new File("config/AAprops.csv"));
-
-				List<AminoAcid> neighbours = AAprops.getResidueNeighbours(aminoAcids, residue);
-
-				for(String[] row: rows) {
+				for(String[] row: this.rows) {
 
 					double aaPropValue = Double.parseDouble(row[map.get(residue.getAminoType())]);
 					double aaWTPropValue = Double.parseDouble(row[map.get(WT.trim().charAt(0))]);
