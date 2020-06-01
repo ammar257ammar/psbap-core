@@ -34,6 +34,7 @@ import nl.unimaas.msb.psbap.SiftsPocketResiduesMapper;
 import nl.unimaas.msb.psbap.UniProtVariantsMapper;
 import nl.unimaas.msb.psbap.model.PdbBindDataset;
 import nl.unimaas.msb.psbap.utils.DataHandler;
+import nl.unimaas.msb.psbap.utils.PdbTools;
 
 /**
  * This class perform the tasks passed through command line
@@ -75,6 +76,19 @@ public class PSBAP
     	    List<String[]> pdbbindDataDsspUrls = pdbbindData.asDsspDownloadUrlsList();    	  	
         	DataHandler.writeDatasetToTSV(pdbbindDataDsspUrls, Config.getProperty("DATASETS_PATH") + "/pdbbind_dssp_urls.tsv");
     		
+        	try {
+				PdbTools.downloadSifts(Config.getProperty("DATASETS_PATH") + "/pdbbind_sifts_urls.tsv",
+						Config.getProperty("SIFTS_PATH") + "/sifts");
+				
+				PdbTools.downloadSifts(Config.getProperty("DATASETS_PATH") + "/pdbbind_fasta_urls.tsv",
+						Config.getProperty("FASTA_PATH") + "/FASTA");
+				
+				PdbTools.downloadSifts(Config.getProperty("DATASETS_PATH") + "/pdbbind_dssp_urls.tsv",
+						Config.getProperty("DSSP_PATH") + "/DSSP");
+				
+			} catch (IOException | InterruptedException e1) {
+				e1.printStackTrace();
+			}
 
         	List<String[]> pdbbindVariants = UniProtVariantsMapper.mapMissenseVariantsToPdbbindDataset(pdbbindData.getData());
 	    	
