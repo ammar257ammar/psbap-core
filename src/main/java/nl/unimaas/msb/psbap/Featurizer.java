@@ -782,7 +782,7 @@ public class Featurizer {
 
 	/**
 	 * A method to generate binding pocket features for a single/all PDB(s)
-	 * @param pdb if the string equals "all" then the features will be generated to all the PDB entries, otherwise will be generated for the given PDB
+	 * @param singlePDB if the string equals "all" then the features will be generated to all the PDB entries, otherwise will be generated for the given PDB
 	 * @throws IOException in case of error in IO operations
 	 * @throws StructureException in case of error in BioJava Structure
 	 */
