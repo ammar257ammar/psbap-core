@@ -20,8 +20,12 @@
 
 package nl.unimaas.msb.psbap;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
+
+import org.biojava.nbio.structure.StructureException;
+import org.openscience.cdk.exception.CDKException;
 
 import nl.unimaas.msb.psbap.model.PdbBindDataset.PdbbindAttribute;
 import nl.unimaas.msb.psbap.Config;
@@ -177,6 +181,49 @@ public class PSBAP
     			Vina.createConfigFilesAfterLigandsStructure(Config.getProperty("VINA_DOCKING_DIR"),false);       		
        		
 			} catch (IOException e) {
+				e.printStackTrace();
+			}
+    		
+    		
+    		break;
+    		
+    	case "generate-features":
+    		
+    		try {
+    			
+    			File vinaFolder = new File("/processing/vina-docking");
+    			
+    			File[] pdbs = vinaFolder.listFiles();
+    			
+    			for(File pdbFile: pdbs) {
+    	    	  	
+    				String pdb = pdbFile.getName();
+    				
+    	    		if(!new File("/features/"+pdb).exists()) {
+    	    			new File("/features/"+pdb).mkdir();
+    	    		}
+    	    		
+    	    		List<String[]> featuresOnePDB = Featurizer.getSnpsFeatures("/tsv/pdbbind_pocket_variants.tsv",Config.getProperty("FOLDX_PDB_DIR"),pdb);
+    	    		DataHandler.writeDatasetToTSV(featuresOnePDB, "/features/"+pdb+"/pdbbind_pocket_variants_features_"+pdb+".tsv");
+    	        	  
+    	        	List<String[]> featuresOnePDBL = Featurizer.getLigandsFeatures(Config.getProperty("LIGANDS_PATH"),"/tsv/chembl_ligands_filtered_combined_tanimoto.tsv",pdb);
+    				DataHandler.writeDatasetToTSV(featuresOnePDBL, "/features/"+pdb+"/chembl_ligands_features_"+pdb+".tsv");
+    	    	
+    	        	List<String[]> featuresOnePocket = Featurizer.getPocketsFeatures(pdb);
+    				DataHandler.writeDatasetToTSV(featuresOnePocket, "/features/"+pdb+"/pdbbind_pocket_features_"+pdb+".tsv");	
+    	    		
+    	    		Vina.generateVinaReport(Config.getProperty("VINA_DOCKING_DIR"),"/features/"+pdb+"/bindingAffinity-official-"+pdb, pdb);
+    	    	}
+    			
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (StructureException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			} catch (CDKException e) {
+				e.printStackTrace();
+			} catch (CloneNotSupportedException e) {
 				e.printStackTrace();
 			}
     		
