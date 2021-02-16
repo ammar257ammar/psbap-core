@@ -1,20 +1,20 @@
-# PSBAP Core Docker
+# PSnpBind Core Docker
 
-This repository is part of the "Pocket SNPs effect on protein-ligand Binding Affinity Prediction (PSBAP)" project and it is a submodule of the main repository 
+This repository is part of the "Pocket SNPs Effect On Protein-Ligand Binding Affinity Project (PSnpBind)" and it is a submodule of the main repository 
 
 https://github.com/ammar257ammar/pocket-snps-effect-binding-affinity
 
-Please prepare and build the docker using the following instruction and refer back to the previous link for proper usage in the context of PSBAP project.
+Please prepare and build the docker using the following instruction and refer back to the previous link for proper usage in the context of PSnpBind project.
 
-### First, clone this repository, go to its directory, then follow next! 
+### First, clone this repository and "cd" to its directory.
 
-### Build the Docker image
+### Second, build the Docker image
 
 ```bash
-docker build -t psbap-core .
+docker build -t psnpbind-core .
 ```
 
-### Check the [Documentation](https://ammar257ammar.github.io/psbap-core/) to explore the functions of the library
+### Check the [Documentation](https://ammar257ammar.github.io/psnpbind-core/) to explore the functions of the library
 
 #### Now you are ready! 
 
