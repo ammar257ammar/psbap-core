@@ -1,7 +1,7 @@
 /**
-* binding Pocket's SNPs effect on Binding Affinity Project (PSBAP) 
+* Binding Pocket SNPs' effect on Binding Affinity Database Project (PSnpBind)
 * 
-*Copyright (C) 2019  Ammar Ammar <ammar257ammar@gmail.com>
+*Copyright (C) 2019-2021  Ammar Ammar <ammar257ammar@gmail.com> ORCID:0000-0002-8399-8990
 *
 *This program is free software: you can redistribute it and/or modify
 *it under the terms of the GNU Affero General Public License as published by
@@ -18,7 +18,7 @@
 *
 */
 
-package nl.unimaas.msb.psbap;
+package io.github.ammar257ammar.psnpbind.core;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -33,8 +33,8 @@ import org.biojava.nbio.structure.io.sifts.SiftsResidue;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 
-import nl.unimaas.msb.psbap.model.PDBbindEntry;
-import nl.unimaas.msb.psbap.utils.PdbTools;
+import io.github.ammar257ammar.psnpbind.core.model.PDBbindEntry;
+import io.github.ammar257ammar.psnpbind.core.utils.PdbTools;
 
 /**
  * This class maps the pocket residues for PdbBind files to the UniProt variants and keep only
@@ -159,14 +159,14 @@ public class SiftsPocketResiduesMapper {
 	                    		if(unique) {
 	        						
 	        						String pdbId = resultArr[4].trim();
-	        						String mutation = resultArr[7].trim()+resultArr[10].trim()+resultArr[12].trim()+resultArr[8].trim()+";";
+	        						//String mutation = resultArr[7].trim()+resultArr[10].trim()+resultArr[12].trim()+resultArr[8].trim()+";";
+	        						String mutation = resultArr[7].trim()+resultArr[12].trim()+resultArr[8].trim()+";";
 	        						
 	        						if(!mutationMap.containsKey(pdbId+"_"+mutation)) {
 	        							
 	        							mutationMap.put(pdbId+"_"+mutation,"");
 	        							
 	        							pdbVariantsRows.add(resultArr);
-
 	        						}
 
 	        					}else {

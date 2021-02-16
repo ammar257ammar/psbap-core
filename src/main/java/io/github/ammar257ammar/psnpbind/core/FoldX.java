@@ -1,7 +1,7 @@
 /**
-* binding Pocket's SNPs effect on Binding Affinity Project (PSBAP) 
+* Binding Pocket SNPs' effect on Binding Affinity Database Project (PSnpBind)
 * 
-*Copyright (C) 2019  Ammar Ammar <ammar257ammar@gmail.com>
+*Copyright (C) 2019-2021  Ammar Ammar <ammar257ammar@gmail.com> ORCID:0000-0002-8399-8990
 *
 *This program is free software: you can redistribute it and/or modify
 *it under the terms of the GNU Affero General Public License as published by
@@ -18,7 +18,7 @@
 *
 */
 
-package nl.unimaas.msb.psbap;
+package io.github.ammar257ammar.psnpbind.core;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -32,7 +32,7 @@ import java.util.Map.Entry;
 
 import org.apache.commons.io.FileUtils;
 
-import nl.unimaas.msb.psbap.utils.DataHandler;
+import io.github.ammar257ammar.psnpbind.core.utils.DataHandler;
 
 /**
  * A class that prepare mutation files for FoldX and generate reports after introducing mutation

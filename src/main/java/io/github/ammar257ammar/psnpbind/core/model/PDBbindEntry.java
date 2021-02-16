@@ -1,7 +1,7 @@
 /**
-* binding Pocket's SNPs effect on Binding Affinity Project (PSBAP) 
+* Binding Pocket SNPs' effect on Binding Affinity Database Project (PSnpBind)
 * 
-*Copyright (C) 2019  Ammar Ammar <ammar257ammar@gmail.com>
+*Copyright (C) 2019-2021  Ammar Ammar <ammar257ammar@gmail.com> ORCID:0000-0002-8399-8990
 *
 *This program is free software: you can redistribute it and/or modify
 *it under the terms of the GNU Affero General Public License as published by
@@ -18,7 +18,7 @@
 *
 */
 
-package nl.unimaas.msb.psbap.model;
+package io.github.ammar257ammar.psnpbind.core.model;
 
 import java.io.IOException;
 import java.util.List;
@@ -30,9 +30,9 @@ import org.biojava.nbio.structure.io.sifts.SiftsEntity;
 import org.biojava.nbio.structure.io.sifts.SiftsResidue;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
-import nl.unimaas.msb.psbap.Config;
-import nl.unimaas.msb.psbap.utils.LigandTools;
-import nl.unimaas.msb.psbap.utils.PdbTools;
+import io.github.ammar257ammar.psnpbind.core.Config;
+import io.github.ammar257ammar.psnpbind.core.utils.LigandTools;
+import io.github.ammar257ammar.psnpbind.core.utils.PdbTools;
 
 /**
  * A class that represent a PdbBind entry folder including all information (amino acids, ligands and SIFTS)

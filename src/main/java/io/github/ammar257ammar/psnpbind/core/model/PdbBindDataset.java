@@ -1,7 +1,7 @@
 /**
-* binding Pocket's SNPs effect on Binding Affinity Project (PSBAP) 
+* Binding Pocket SNPs' effect on Binding Affinity Database Project (PSnpBind)
 * 
-*Copyright (C) 2019  Ammar Ammar <ammar257ammar@gmail.com>
+*Copyright (C) 2019-2021  Ammar Ammar <ammar257ammar@gmail.com> ORCID:0000-0002-8399-8990
 *
 *This program is free software: you can redistribute it and/or modify
 *it under the terms of the GNU Affero General Public License as published by
@@ -18,7 +18,7 @@
 *
 */
 
-package nl.unimaas.msb.psbap.model;
+package io.github.ammar257ammar.psnpbind.core.model;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import nl.unimaas.msb.psbap.Config;
+import io.github.ammar257ammar.psnpbind.core.Config;
 
 /**
  * A class represents a PdbBind dataset object with methods to manipulate the dataset (filtering,
@@ -238,10 +238,10 @@ public class PdbBindDataset {
 	    	
 	        @SuppressWarnings("unchecked")
 			Map.Entry<String, List<String[]>> pair = (Map.Entry<String, List<String[]>>)it.next();
-	        
+	       
 	        List<String[]> ligandAndRes = (List<String[]>) pair.getValue();
-
-	        String[] ligandAndResMin = Collections.min(ligandAndRes, Comparator.comparing(c -> c[1]));
+	        List<String[]> ligandAndResTemp = ligandAndRes.stream().filter(line -> (!"3e5a".equals(line[0].trim()) && !"1z95".equals(line[0].trim()))).collect(Collectors.toList());     
+	        String[] ligandAndResMin = Collections.min(ligandAndResTemp, Comparator.comparing(c -> c[1]));
 
 	        if(preserveLigandData) {
 	        	String ligandData = "";
@@ -250,7 +250,6 @@ public class PdbBindDataset {
 	        	}
 	        	ligandAndResMin[PdbbindAttribute.LIGAND.ordinal()] = ligandData;
 	        }
-
 	        
 			this.pdbbindData.add(ligandAndResMin);
 

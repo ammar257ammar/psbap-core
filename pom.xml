@@ -2,12 +2,12 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>nl.unimaas.msb</groupId>
-  <artifactId>psbap-core</artifactId> 
-  <version>0.0.1-SNAPSHOT</version>
+  <groupId>io.github.ammar257ammar.psnpbind</groupId>
+  <artifactId>psnpbind-core</artifactId> 
+  <version>1.0-Stable</version>
   <packaging>jar</packaging>
 
-  <name>psbap-core</name>
+  <name>psnpbind-core</name>
   <url>http://maven.apache.org</url>
 
   <properties>
@@ -68,13 +68,11 @@
 	    <artifactId>j2html</artifactId>
 	    <version>1.4.0</version>
 	</dependency>
-	
 	<dependency>
 	    <groupId>org.apache.commons</groupId>
 	    <artifactId>commons-lang3</artifactId>
 	    <version>3.9</version>
 	</dependency>
-	
 	<dependency>
 	    <groupId>org.jooq</groupId>
 	    <artifactId>jool</artifactId>
@@ -83,7 +81,22 @@
 	<dependency>
 	    <groupId>org.reflections</groupId>
 	    <artifactId>reflections</artifactId>
-	    <version>0.9.12</version>
+	    <version>0.9.12</version> 
+	</dependency>
+	<dependency>
+	    <groupId>com.googlecode.json-simple</groupId>
+	    <artifactId>json-simple</artifactId>
+	    <version>1.1.1</version>
+	</dependency>
+	<dependency>
+	    <groupId>mysql</groupId>
+	    <artifactId>mysql-connector-java</artifactId>
+	    <version>8.0.22</version>
+	</dependency>
+	<dependency>
+	   <groupId>org.mybatis</groupId>
+	   <artifactId>mybatis</artifactId>
+	   <version>3.4.5</version>
 	</dependency>
   </dependencies>
   
@@ -97,7 +110,7 @@
 					</descriptorRefs>
 					<archive>
 						<manifest>
-							<mainClass>nl.unimaas.msb.psbap.PSBAP</mainClass>
+							<mainClass>io.github.ammar257ammar.psnpbind.core.PSnpBindCore</mainClass>
 						</manifest>
 					</archive>
 				</configuration>

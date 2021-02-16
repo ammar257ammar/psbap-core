@@ -1,7 +1,7 @@
 /**
-* binding Pocket's SNPs effect on Binding Affinity Project (PSBAP) 
+* Binding Pocket SNPs' effect on Binding Affinity Database Project (PSnpBind)
 * 
-*Copyright (C) 2019  Ammar Ammar <ammar257ammar@gmail.com>
+*Copyright (C) 2019-2021  Ammar Ammar <ammar257ammar@gmail.com> ORCID:0000-0002-8399-8990
 *
 *This program is free software: you can redistribute it and/or modify
 *it under the terms of the GNU Affero General Public License as published by
@@ -18,7 +18,7 @@
 *
 */
 
-package nl.unimaas.msb.psbap;
+package io.github.ammar257ammar.psnpbind.core;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -27,7 +27,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.vecmath.Point3d;
 
@@ -41,9 +45,9 @@ import org.biojava.nbio.structure.StructureImpl;
 import org.biojava.nbio.structure.StructureTools;
 import org.biojava.nbio.structure.io.PDBFileReader;
 
-import nl.unimaas.msb.psbap.model.PDBbindEntry;
-import nl.unimaas.msb.psbap.utils.DataHandler;
-import nl.unimaas.msb.psbap.utils.PdbTools;
+import io.github.ammar257ammar.psnpbind.core.model.PDBbindEntry;
+import io.github.ammar257ammar.psnpbind.core.utils.DataHandler;
+import io.github.ammar257ammar.psnpbind.core.utils.PdbTools;
 
 /**
  * A class to prepare AutoDock Vina folder structure and prepare the grid box and extract binding affinities from docking results
@@ -476,28 +480,71 @@ public class Vina {
 			}	
 		}
 	}
-	
+
 	/**
-	 * A method to generate Vina report with binding affinities extracted from all dockings results
+	 * A method to generate Vina report with binding affinities extracted from all protein docking results
+	 * @param entriesPath the path of the selected PDBbind entries
+	 * @param outputPath the output files path (the TSV_PATH config value)
+	 * @throws IOException in case of error in IO operations
+	 */
+	public static void generateVinaReportAll(String entriesPath, String outputPath) throws IOException {
+		
+		if(!entriesPath.endsWith("/")) {
+			entriesPath += "/";
+		}
+		
+		if(!outputPath.endsWith("/")) {
+			outputPath += "/";
+		}
+		
+		if(!(new File(outputPath).exists())) {
+			new File(outputPath).mkdir();
+		}
+		
+		File vinaFolder = new File("/processing/vina-docking");
+		
+		File[] pdbs = vinaFolder.listFiles();
+		
+		List<File> pdbsL = Arrays.asList(pdbs).stream().filter(folder -> folder.isDirectory() == true).collect(Collectors.toList()); 
+
+		List<String[]> bindingResults = new ArrayList<String[]>();
+		
+		for(File pdbFile: pdbsL) {
+    	  	
+			String pdb = pdbFile.getName();
+			
+    		if(!new File(outputPath+pdb).exists()) {
+    			new File(outputPath+pdb).mkdir();
+    		}
+    			
+    		bindingResults = Vina.generateVinaReportSingle(entriesPath, outputPath+pdb+"/bindingAffinity-official-"+pdb, pdb, bindingResults);
+    	}
+		
+		DataHandler.writeDatasetToTSV(bindingResults, outputPath+"docking-results-all.tsv");
+	}
+
+	/**
+	 * A method to generate Vina report with binding affinities extracted from a single protein docking results
 	 * @param entriesPath the path of the selected PDBbind entries
 	 * @param outputPath the output file name prefix (two TSV files will be generated, one of them contains "-df" added to the prefix)
 	 * @param pdb the PdbBind entry protein
 	 * @throws IOException in case of error in IO operations
 	 */
-	public static void generateVinaReport(String entriesPath, String outputPath, String pdb) throws IOException {
-		
-		File entries = new File(entriesPath);
-		File[] mols = entries.listFiles();
-		
-		System.out.println(mols.length+ " files");
+	public static List<String[]> generateVinaReportSingle(String entriesPath, String outputPath, String pdb, List<String[]> bindingResults) throws IOException {
 		
 		boolean headerAdded = false;
 		
-		List<String[]> bindingResults = new ArrayList<String[]>();
+		if(!entriesPath.endsWith("/")) {
+			entriesPath += "/";
+		}
+		
+		//List<String[]> bindingResults = new ArrayList<String[]>();
 		List<String[]> bindingResultsDf = new ArrayList<String[]>();
 		
 		List<String> bindingResultsDfHeader = new ArrayList<String>();
 				
+		System.out.println(entriesPath+pdb+"/proteins");
+		
 		File molVarsFolder = new File(entriesPath+pdb+"/proteins");
 		File[] molVars = molVarsFolder.listFiles();
 						
@@ -516,33 +563,58 @@ public class Vina {
 				File molLigandsFolder = new File(entriesPath+pdb+"/proteins/"+molVarFolder.getName()+"/vina");
 				File[] molLigands = molLigandsFolder.listFiles();
 				
+				List<File> molLigandsL = Arrays.asList(molLigands).stream().filter(folder -> folder.isDirectory() == true).collect(Collectors.toList()); 
+
 				System.out.println(molVarFolder.getName()+ " files");
 
-				for(File molLigand: molLigands) {
+				for(File molLigand: molLigandsL) {
 					
-					File dockingLog = new File(entriesPath+pdb+"/proteins/"+molVarFolder.getName()+"/vina/"+molLigand.getName()+"/"+molLigand.getName()+"_min_log.txt");
+					File dockingLog = new File(entriesPath+pdb+"/proteins/"+molVarFolder.getName()+"/vina/"+molLigand.getName()+"/"+molLigand.getName()+"_min_log.txt");			
+					File dockingPoses = new File(entriesPath+pdb+"/proteins/"+molVarFolder.getName()+"/vina/"+molLigand.getName()+"/"+molLigand.getName()+"_min_docking.pdbqt");					
 					
+					List<String> conformers = new ArrayList<String>();
 					
-					if(dockingLog.exists()) {
+					if(dockingPoses.exists()) {
 						
-						List<String> dockingResults = Files.readAllLines(Paths.get(entriesPath+pdb+"/proteins/"+molVarFolder.getName()+"/vina/"+molLigand.getName()+"/"+molLigand.getName()+"_min_log.txt"));
+						if(dockingLog.exists()) {
+						
+							List<String> dockingResults = Files.readAllLines(Paths.get(dockingLog.getAbsolutePath()));
 							
-						String bindingAffinity = "";
-						
-						for(String line: dockingResults) {
-							if(line.startsWith("   1")) {
-								bindingAffinity = line.substring(8, 22).trim();
+							Pattern p = Pattern.compile("^\\s+(?<seq>[0-9])\\s+(?<ba>\\S+)\\s+(?<dist>\\S+)\\s+(?<best>\\S+)$"); 
+							Matcher m;
+							
+							String bindingAffinity = "";
+							
+							for(String line: dockingResults) {
 								
-								bindingResults.add(new String[] {pdb, molVarFolder.getName(), molLigand.getName(), bindingAffinity});
+								m = p.matcher(line);
 								
+								if(m.find()){
+									String seq = m.group("seq").trim();
+									String ba = m.group("ba").trim();
+									
+									if(seq.matches("[0-9]") && ba.matches("[+-]?([0-9]*[.])?[0-9]+")){
+										conformers.add("Conformer "+seq+": "+ba);	
+										
+										if(line.startsWith("   1")) {
+											bindingAffinity = ba;											
+										}
+									}
+								}
+							}
+							
+							if(conformers.size() > 0){
+								bindingResults.add(new String[] {pdb, molVarFolder.getName(), molLigand.getName(), String.join(";", conformers)});
 								varLine.add(bindingAffinity);
 							}
+							
+							if(bindingAffinity.equals("") || bindingAffinity == null) {
+								varLine.add("-");
+							}
+							
+						}else {
+							varLine.add("-");							
 						}
-						
-						if(bindingAffinity.equals("") || bindingAffinity == null) {
-							varLine.add("-");
-						}
-						
 					}else {
 						varLine.add("-");
 					}
@@ -560,9 +632,10 @@ public class Vina {
 
 		bindingResultsDf.add(0, bindingResultsDfHeader.toArray(new String[bindingResultsDfHeader.size()]));
 		
-		DataHandler.writeDatasetToTSV(bindingResults, outputPath+".tsv");
+		//DataHandler.writeDatasetToTSV(bindingResults, outputPath+".tsv");
 		DataHandler.writeDatasetToTSV(bindingResultsDf, outputPath+"_df.tsv");
 		
+		return bindingResults;
 	}
 
 }

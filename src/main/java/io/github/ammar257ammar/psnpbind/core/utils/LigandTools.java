@@ -1,7 +1,7 @@
 /**
-* binding Pocket's SNPs effect on Binding Affinity Project (PSBAP) 
+* Binding Pocket SNPs' effect on Binding Affinity Database Project (PSnpBind)
 * 
-*Copyright (C) 2019  Ammar Ammar <ammar257ammar@gmail.com>
+*Copyright (C) 2019-2021  Ammar Ammar <ammar257ammar@gmail.com> ORCID:0000-0002-8399-8990
 *
 *This program is free software: you can redistribute it and/or modify
 *it under the terms of the GNU Affero General Public License as published by
@@ -18,7 +18,7 @@
 *
 */
 
-package nl.unimaas.msb.psbap.utils;
+package io.github.ammar257ammar.psnpbind.core.utils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -142,7 +142,7 @@ public class LigandTools {
 	 * @param addHydrogens boolean if hydrogen should be added to the molecule IAtomContainer
 	 * @return a CDK IAtomContainer
 	 */
-	public static IAtomContainer readSMILESandAddHydrogens(File file, boolean addHydrogens)
+	public static IAtomContainer readSmilesFileandAddHydrogens(File file, boolean addHydrogens)
 			throws IOException, ClassNotFoundException, CDKException {
 
 		List<String> lines = Files.readAllLines(Paths.get(file.getAbsolutePath()), StandardCharsets.UTF_8);
@@ -151,6 +151,56 @@ public class LigandTools {
 
 		System.out.println(smile);
 		
+		SmilesParser sp = new SmilesParser(SilentChemObjectBuilder.getInstance());
+
+		IAtomContainer ac;
+		try {
+			ac = sp.parseSmiles(smile);
+		} catch (InvalidSmilesException e) {
+			System.out.println("ERROR: reading file failed!!");
+			return null;
+		}
+
+		AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(ac);
+
+		for (IAtom atom : ac.atoms())
+			atom.setImplicitHydrogenCount(0);
+
+		if (addHydrogens) {
+
+			CDKHydrogenAdder adder = CDKHydrogenAdder.getInstance(SilentChemObjectBuilder.getInstance());
+			adder.addImplicitHydrogens(ac);
+
+			AtomContainerManipulator.convertImplicitToExplicitHydrogens(ac);
+		}
+
+		ElectronDonation model = ElectronDonation.daylight();
+		CycleFinder cycles = Cycles.or(Cycles.all(), Cycles.all(6));
+		Aromaticity aromaticity = new Aromaticity(model, cycles);
+
+		aromaticity.apply(ac);
+
+		try {
+
+			Kekulization.kekulize(ac);
+
+		} catch (CDKException ex) {
+			System.out.println("kekulize failed!!");
+		}
+
+		return ac;
+	}
+	
+	/**
+	 * A method to read a molecule from SMILES string file and parse it
+	 * as a CDK IAtomContainer
+	 * @param smile the molecule's SMILES string
+	 * @param addHydrogens boolean if hydrogen should be added to the molecule IAtomContainer
+	 * @return a CDK IAtomContainer
+	 */
+	public static IAtomContainer readSmilesStringandAddHydrogens(String smile, boolean addHydrogens)
+			throws IOException, ClassNotFoundException, CDKException {
+
 		SmilesParser sp = new SmilesParser(SilentChemObjectBuilder.getInstance());
 
 		IAtomContainer ac;

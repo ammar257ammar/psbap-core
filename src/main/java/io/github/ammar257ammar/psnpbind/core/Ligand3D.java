@@ -1,7 +1,7 @@
 /**
-* binding Pocket's SNPs effect on Binding Affinity Project (PSBAP) 
+* Binding Pocket SNPs' effect on Binding Affinity Database Project (PSnpBind)
 * 
-*Copyright (C) 2019  Ammar Ammar <ammar257ammar@gmail.com>
+*Copyright (C) 2019-2021  Ammar Ammar <ammar257ammar@gmail.com> ORCID:0000-0002-8399-8990
 *
 *This program is free software: you can redistribute it and/or modify
 *it under the terms of the GNU Affero General Public License as published by
@@ -18,7 +18,7 @@
 *
 */
 
-package nl.unimaas.msb.psbap;
+package io.github.ammar257ammar.psnpbind.core;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -42,8 +42,8 @@ import com.google.common.io.Files;
 import com.univocity.parsers.tsv.TsvParser;
 import com.univocity.parsers.tsv.TsvParserSettings;
 
-import nl.unimaas.msb.psbap.model.PdbBindDataset;
-import nl.unimaas.msb.psbap.model.PdbBindDataset.PdbbindAttribute;
+import io.github.ammar257ammar.psnpbind.core.model.PdbBindDataset;
+import io.github.ammar257ammar.psnpbind.core.model.PdbBindDataset.PdbbindAttribute;
 
 
 /**
@@ -141,10 +141,11 @@ public class Ligand3D {
 
 								for (Map.Entry<Object, Object> entry : ac.getProperties().entrySet()) {
 									if (entry.getKey().equals("chembl_id")) {
-										ligandsDataset.add(new String[] { molFolder.getName(),
-												similarLigand.getName().substring(0,
-														similarLigand.getName().lastIndexOf(".")) + "_" + index++,
-												entry.getValue().toString() });
+										ligandsDataset.add(
+												new String[] { 
+													molFolder.getName(),
+													similarLigand.getName().substring(0,similarLigand.getName().lastIndexOf(".")) + "_" + index++,
+													entry.getValue().toString() });
 									}
 								}
 
@@ -162,7 +163,7 @@ public class Ligand3D {
 	 * @param similarLigands the OpenBabel-selected ligands list
 	 * @return a list of string arrays holding the filtered ligands names and IDs 
 	 */
-	public static List<String[]> getLigandsIDsFiltered(List<String[]> similarLigands) {
+	public static List<String[]> getLigandsIDsFiltered(List<String[]> similarLigands, boolean keepall) {
 
 		Map<Object, List<String[]>> map = similarLigands.stream().collect(Collectors.groupingBy(line -> line[0]));
 
@@ -192,7 +193,12 @@ public class Ligand3D {
 				ligandAndRes2.remove(0);
 
 				for (String[] row : ligandAndRes2) {
-					new File(Config.getProperty("LIGANDS_PATH") + "/" + row[0] + "/splitted/" + row[1]).delete();
+					new File(Config.getProperty("LIGANDS_PATH") + "/" + row[0] + "/splitted/" + row[1] + ".mol2").delete();
+					new File(Config.getProperty("LIGANDS_PATH") + "/" + row[0] + "/splitted-smi/" + row[1] + ".smi").delete();
+					
+					if(keepall) {
+						similarLigands.add(row);						
+					}
 				}
 
 				similarLigands.add(ligandAndResMin);
@@ -213,11 +219,11 @@ public class Ligand3D {
 	 * @throws FileNotFoundException in case file not found
 	 * @return a list of string arrays holding the filtered ligands names and IDs 
 	 */
-	public static List<String[]> getLigandsIDsFiltered(String ligandsPath) throws FileNotFoundException, IOException {
+	public static List<String[]> getLigandsIDsFiltered(String ligandsPath, boolean keepall) throws FileNotFoundException, IOException {
 
 		List<String[]> similarLigands = Ligand3D.getLigandIDsFromFiles(ligandsPath);
 
-		similarLigands = Ligand3D.getLigandsIDsFiltered(similarLigands);
+		similarLigands = Ligand3D.getLigandsIDsFiltered(similarLigands, keepall);
 
 		return similarLigands;
 	}
@@ -231,7 +237,7 @@ public class Ligand3D {
 	 * @throws FileNotFoundException in case file not found
 	 * @return a list of string arrays holding the filtered ligands names, IDs and Tanimoto similarity 
 	 */
-	public static List<String[]> combineIDsAndTanimotoOfLigands(String ligandsPath, String idsFile)
+	public static List<String[]> combineIDsAndTanimotoOfLigands(String ligandsPath, String idsFile, boolean keepall)
 			throws FileNotFoundException, IOException {
 
 		List<String[]> ligandsDataset = new ArrayList<String[]>();
@@ -297,9 +303,131 @@ public class Ligand3D {
 			ligandsDataset.add(new String[] { tuple.v1[0], tuple.v1[1], tuple.v1[2], tuple.v2[3] });
 		}
 
-		ligandsDataset = Ligand3D.getLigandsIDsFiltered(ligandsDataset);
+		ligandsDataset = Ligand3D.getLigandsIDsFiltered(ligandsDataset, keepall);
 
 		return ligandsDataset;
+
+	}
+	
+	/**
+	 * A method to combine ligands information with Tanimoto similarity and SMILES
+	 * @param ligandsPath the OpenBabel-selected ligands folder path
+	 * @param idsFile ligands IDs file
+	 * @throws IOException in case of error in IO operations
+	 * @throws FileNotFoundException in case file not found
+	 * @return a list of string arrays holding the filtered ligands names, IDs, Tanimoto similarity and SMILES 
+	 */
+	public static List<String[]> combineIDsAndTanimotoAndSmilesOfLigands(String ligandsPath, String idsFile, boolean keepall)
+			throws FileNotFoundException, IOException {
+
+		List<String[]> ligandsDataset = new ArrayList<String[]>();
+		List<String[]> ligandsDatasetFinal = new ArrayList<String[]>();
+
+		List<String[]> logsDataset = new ArrayList<String[]>();
+
+		List<String[]> smilesDataset = new ArrayList<String[]>();
+
+		
+		File casf = new File(ligandsPath);
+		File[] mols = casf.listFiles();
+
+		for (File molFolder : mols) {
+			if (molFolder.isDirectory()) {
+
+				File logsFolder = new File(molFolder.getAbsolutePath() + "/logs");
+
+				if (logsFolder.exists()) {
+
+					File[] logs = logsFolder.listFiles();
+
+					for (File log : logs) {
+
+						try (BufferedReader reader = new BufferedReader(new FileReader(log))) {
+							String line;
+							boolean moleculeDefined = false;
+							String molecule = "";
+
+							while ((line = reader.readLine()) != null) {
+
+								if (line.startsWith(">")) {
+
+									if (!moleculeDefined) {
+										molecule = line.substring(1, 5);
+										moleculeDefined = true;
+									} else {
+
+										logsDataset.add(new String[] { molFolder.getName(), molecule,
+												line.substring(1, line.indexOf("Tanimoto")).trim(),
+												line.substring(line.lastIndexOf("=") + 1, line.length()).trim() });
+									}
+								}
+							}
+						} // try
+
+					} // for logs
+				} // if log exists
+				
+				
+				File smiFolder = new File(molFolder.getAbsolutePath() + "/results-smi");
+
+				if (smiFolder.exists()) {
+
+					File[] smiles = smiFolder.listFiles();
+
+					for (File smile : smiles) {
+
+						try (BufferedReader reader = new BufferedReader(new FileReader(smile))) {
+							String line;
+
+							while ((line = reader.readLine()) != null) {
+
+								if (line.split("\t").length == 2) {
+
+									smilesDataset.add(new String[] { molFolder.getName(), smile.getName().substring(0,4),
+												line.split("\t")[1].trim(),
+												line.split("\t")[0].trim() });
+								}
+							}
+						}
+					} // for smiles
+				} // if smile exists
+			} // if (molFolder.isDirectory())
+		} // for molecules in /pdb
+
+		TsvParserSettings settings = new TsvParserSettings();
+		settings.getFormat().setLineSeparator("\n");
+
+		TsvParser parser = new TsvParser(settings);
+
+		List<String[]> rows = parser.parseAll(new File(idsFile));
+
+		Seq<String[]> seqLogs = Seq.seq(logsDataset);
+
+		Seq<String[]> seqSmiles = Seq.seq(smilesDataset);
+
+		Seq<String[]> seqIds = Seq.seq(rows);
+
+		List<Tuple2<String[], String[]>> joinDataset = seqIds
+				.leftOuterJoin(seqLogs, (t, u) -> t[0].equals(u[0]) && t[2].equals(u[2])).collect(Collectors.toList());
+
+		for (Tuple2<String[], String[]> tuple : joinDataset) {
+			ligandsDataset.add(new String[] { tuple.v1[0], tuple.v1[1], tuple.v1[2], tuple.v2[3] });
+		}
+
+		// A second join
+		Seq<String[]> seqligands = Seq.seq(ligandsDataset);
+
+		List<Tuple2<String[], String[]>> joinDataset2 = seqligands
+				.leftOuterJoin(seqSmiles, (t, u) -> t[0].equals(u[0]) && t[2].equals(u[2])).collect(Collectors.toList());
+
+		for (Tuple2<String[], String[]> tuple : joinDataset2) {
+			ligandsDatasetFinal.add(new String[] { tuple.v1[0], tuple.v1[1], tuple.v1[2], tuple.v1[3], tuple.v2[3] });
+		}
+		
+		
+		ligandsDatasetFinal = Ligand3D.getLigandsIDsFiltered(ligandsDatasetFinal, keepall);
+
+		return ligandsDatasetFinal;
 
 	}
 

@@ -9,13 +9,28 @@ COPY src/ ./src/
 RUN mvn package 
 
 
-FROM openjdk:8-jre-alpine
+FROM ubuntu:bionic-20191029
 
 LABEL maintainer "Ammar Ammar <ammar257ammar@gmail.com>"
 
-RUN apk update && apk add bash
+RUN apt-get update && \
+	apt-get install -y wget openjdk-8-jdk && \
+	apt-get install -y ant && \
+	apt-get clean && \
+	rm -rf /var/lib/apt/lists/* && \
+	rm -rf /var/cache/oracle-jdk8-installer;
+	
+RUN apt-get update && \
+	apt-get install -y ca-certificates-java && \
+	apt-get clean && \
+	update-ca-certificates -f && \
+	rm -rf /var/lib/apt/lists/* && \
+	rm -rf /var/cache/oracle-jdk8-installer;
 
-COPY --from=maven target/psbap-core-0.0.1-SNAPSHOT-jar-with-dependencies.jar /app/psbap-core.jar
+ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/
+RUN export JAVA_HOME
 
-ENTRYPOINT ["java","-jar","/app/psbap-core.jar"]
+COPY --from=maven target/psnpbind-core-1.0-Stable-jar-with-dependencies.jar /app/psnpbind-core.jar
+
+ENTRYPOINT ["java","-jar","/app/psnpbind-core.jar"]
 CMD ["-h"]
