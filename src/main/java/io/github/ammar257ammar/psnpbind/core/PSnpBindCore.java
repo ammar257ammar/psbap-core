@@ -153,20 +153,20 @@ public class PSnpBindCore
     	case "ligands-tanimoto-dataset":
     		    		
 			try {
-				List<String[]> similarLigands = Ligand3D.getLigandsIDsFiltered(Config.getProperty("LIGANDS_PATH"), true);
+				List<String[]> similarLigands = Ligand3D.getLigandsIDsFiltered(Config.getProperty("LIGANDS_PATH"), false);
 	        	
 				DataHandler.writeDatasetToTSV(similarLigands, 
 	        			Config.getProperty("TSV_PATH") + "/chembl_ligands_filtered.tsv");
 
 	        	List<String[]> ligandsWithIDsAndTanimoto = Ligand3D.combineIDsAndTanimotoOfLigands(Config.getProperty("LIGANDS_PATH"), 
-	        			Config.getProperty("TSV_PATH") + "/chembl_ligands_filtered.tsv", true);
+	        			Config.getProperty("TSV_PATH") + "/chembl_ligands_filtered.tsv", false);
 
 	        	DataHandler.writeDatasetToTSV(ligandsWithIDsAndTanimoto, 
 	        			Config.getProperty("TSV_PATH") + "/chembl_ligands_filtered_combined_tanimoto.tsv");
 	        	
 	        	
 	        	List<String[]> ligandsWithIDsAndTanimotoAndSmiles = Ligand3D.combineIDsAndTanimotoAndSmilesOfLigands(Config.getProperty("LIGANDS_PATH"), 
-	        			Config.getProperty("TSV_PATH") + "/chembl_ligands_filtered.tsv", true);
+	        			Config.getProperty("TSV_PATH") + "/chembl_ligands_filtered.tsv", false);
 	        	
 	        	DataHandler.writeDatasetToTSV(ligandsWithIDsAndTanimotoAndSmiles, 
 	        			Config.getProperty("TSV_PATH") + "/chembl_ligands_filtered_combined_tanimoto_smiles.tsv");
