@@ -6,7 +6,7 @@ PSnpBind core library is the main library for PSnpBind data processing and datab
 
 This repository is part of the "Pocket SNPs Effect On Protein-Ligand Binding Affinity Project (PSnpBind)" and it is a needed to reproduce the work as described in the main repository 
 
-https://github.com/ammar257ammar/pocket-snps-effect-binding-affinity
+https://github.com/ammar257ammar/PSnpBind-Build
 
 Please prepare and build the docker using the following instruction and refer back to the previous link for proper usage in the context of PSnpBind project.
 
