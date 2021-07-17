@@ -1,3 +1,23 @@
+/**
+* Binding Pocket SNPs' effect on Binding Affinity Database Project (PSnpBind)
+* 
+*Copyright (C) 2019-2021  Ammar Ammar <ammar257ammar@gmail.com> ORCID:0000-0002-8399-8990
+*
+*This program is free software: you can redistribute it and/or modify
+*it under the terms of the GNU Affero General Public License as published by
+*the Free Software Foundation, either version 3 of the License, or
+*(at your option) any later version.
+*
+*This program is distributed in the hope that it will be useful,
+*but WITHOUT ANY WARRANTY; without even the implied warranty of
+*MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*GNU Affero General Public License for more details.
+*
+*You should have received a copy of the GNU Affero General Public License
+*along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
+*/
+
 package io.github.ammar257ammar.psnpbind.core.db;
 
 import java.io.BufferedReader;
@@ -43,9 +63,19 @@ import com.univocity.parsers.csv.CsvParserSettings;
 import io.github.ammar257ammar.psnpbind.core.Config;
 import io.github.ammar257ammar.psnpbind.core.utils.LigandTools;
 
+/**
+ * A class to prepare populate the database with PSnPBind Data.
+ * 
+ * @author Ammar Ammar
+ *
+ */
 public class DbDataFabricator {
 	
-	
+  	
+    /**
+     * Create the table structure of the database
+     * 
+     */
 	public static void sanityChecks() {
 		
 		Connection con = null;
@@ -70,6 +100,12 @@ public class DbDataFabricator {
 		} 
 	}
 	
+	/**
+     * Insert Ligand data and docking results into the database. In the process, 
+     * 5 descriptors of each ligand are computed (number of rotatable bonds,
+     * hydrogen donor count, hydrogen acceptor count, molecular weight, XLogP)
+     * 
+     */
 	public static void populateDBWithLigandsData() {
 		
 		CsvParserSettings settings = new CsvParserSettings();
@@ -228,6 +264,10 @@ public class DbDataFabricator {
 		} 
 	}
 	
+	/**
+     * Insert variants data into the database
+     * 
+     */
 	public static void populateDBWithVariantsData() {
 				
 		Connection con = null;
@@ -325,6 +365,11 @@ public class DbDataFabricator {
 		} 
 	}
 	
+	/**
+     * Insert protein data into the database. In the process, an API call to RCSB protein data bank is made to obtain information
+     * about each protein.
+     * 
+     */
 	public static void populateDBWithProteinsData() {
 		
 		Connection con = null;
@@ -437,6 +482,7 @@ public class DbDataFabricator {
 	/**
 	 * A method to round a double number to four digits after the floating point
 	 * @param value the value to be rounded
+	 * @return a double value of the rounded number
 	 */
 	public static double r(double value) {
 

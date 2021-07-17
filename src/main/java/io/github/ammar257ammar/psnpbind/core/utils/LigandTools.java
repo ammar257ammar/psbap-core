@@ -59,6 +59,9 @@ public class LigandTools {
 	 * @param file the molecule file object
 	 * @param addHydrogens boolean if hydrogen should be added to the molecule IAtomContainer
 	 * @return a CDK IAtomContainer
+     * @throws IOException thrown exception
+     * @throws ClassNotFoundException thrown exception
+     * @throws CDKException thrown exception
 	 */
 	public static IAtomContainer readMol2andAddHydrogens(File file, boolean addHydrogens)
 			throws IOException, ClassNotFoundException, CDKException {
@@ -141,6 +144,9 @@ public class LigandTools {
 	 * @param file the molecule SMILES file object
 	 * @param addHydrogens boolean if hydrogen should be added to the molecule IAtomContainer
 	 * @return a CDK IAtomContainer
+     * @throws IOException thrown exception
+     * @throws ClassNotFoundException thrown exception
+     * @throws CDKException thrown exception
 	 */
 	public static IAtomContainer readSmilesFileandAddHydrogens(File file, boolean addHydrogens)
 			throws IOException, ClassNotFoundException, CDKException {
@@ -197,6 +203,9 @@ public class LigandTools {
 	 * @param smile the molecule's SMILES string
 	 * @param addHydrogens boolean if hydrogen should be added to the molecule IAtomContainer
 	 * @return a CDK IAtomContainer
+     * @throws IOException thrown exception
+     * @throws ClassNotFoundException thrown exception
+     * @throws CDKException thrown exception
 	 */
 	public static IAtomContainer readSmilesStringandAddHydrogens(String smile, boolean addHydrogens)
 			throws IOException, ClassNotFoundException, CDKException {

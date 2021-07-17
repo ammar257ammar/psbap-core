@@ -40,8 +40,10 @@ import com.univocity.parsers.tsv.TsvWriterSettings;
  */
 public class DataHandler {
 
-	/**
-	 * write a dataset to TSV file
+    public static final int MAX_NUMBER_OF_RECORDS=10;
+	
+    /**
+	 * write a dataset to TSV file.
 	 * @param dataset to be written to the filesystem
 	 * @param path of the file to write the dataset to it
 	 * @param header row for the dataset
@@ -69,7 +71,7 @@ public class DataHandler {
 	}
 	
 	/**
-	 * Overload writeDatasetToTSV(dataset, path, header) to write datasets without header
+	 * Overload writeDatasetToTSV(dataset, path, header) to write datasets without header.
 	 * @param dataset to be written to the filesystem
 	 * @param path of the file to write the dataset to it
 	 */
@@ -103,10 +105,10 @@ public class DataHandler {
 	 */
 	public static void printDatasetHead(List<String[]> dataset) {
 		
-		if(dataset.size() < 10) {
+		if(dataset.size() < MAX_NUMBER_OF_RECORDS) {
 			printDatasetHead(dataset, dataset.size());
 		}else {
-			printDatasetHead(dataset, 10);
+			printDatasetHead(dataset, MAX_NUMBER_OF_RECORDS);
 		}
 	
 	}

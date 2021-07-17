@@ -52,6 +52,7 @@ public class SiftsPocketResiduesMapper {
 	 * @param path of the variants file
 	 * @param pdbbindEntriesFile path of the PdbBind dataset file
 	 * @param mappingType wich is wither "protein" or "pocket"
+     * @param unique if true, only unique rows will be kept
 	 * @return a dataset as list of string arrays
 	 */
 	public static List<String[]> mapPocketResidues(String path, String pdbbindEntriesFile, String mappingType, boolean unique){

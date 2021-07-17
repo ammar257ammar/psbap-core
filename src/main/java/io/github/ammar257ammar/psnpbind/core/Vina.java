@@ -50,7 +50,7 @@ import io.github.ammar257ammar.psnpbind.core.utils.DataHandler;
 import io.github.ammar257ammar.psnpbind.core.utils.PdbTools;
 
 /**
- * A class to prepare AutoDock Vina folder structure and prepare the grid box and extract binding affinities from docking results
+ * A class to prepare AutoDock Vina folder structure and prepare the grid box and extract binding affinities from docking results.
  * 
  * @author Ammar Ammar
  *
@@ -254,6 +254,7 @@ public class Vina {
 	 * A method to generate a BioJava Structure from the binding pocket of PDBbind entry protein after minimization
 	 * @param pdb the PdbBind entry protein
 	 * @param finalPDBPath the path of the minimzed PDB (wild-type or mutation)
+     * @return a Structure object for the pocket of a given PDB
 	 * @throws IOException in case of error in IO operations
 	 */
 	public static Structure getPocketForModifiedPDBbindStructure(String pdb, String finalPDBPath) throws IOException{
@@ -292,6 +293,7 @@ public class Vina {
 	 * A method to generate Vina grid box config from the binding pocket of PDBbind entry protein after minimization
 	 * @param pdb the PdbBind entry protein
 	 * @param finalPDBPath the path of the minimzed PDB (wild-type or mutation)
+     * @return a list of double arrays representing the calculated Vina Grid need for docking
 	 * @throws IOException in case of error in IO operations
 	 */
 	public static List<double[]> calculateVinaGridEnhanced(String pdb, String finalPDBPath) throws IOException{
@@ -528,6 +530,8 @@ public class Vina {
 	 * @param entriesPath the path of the selected PDBbind entries
 	 * @param outputPath the output file name prefix (two TSV files will be generated, one of them contains "-df" added to the prefix)
 	 * @param pdb the PdbBind entry protein
+     * @param bindingResults a dataset to append the Vina reports rows to.
+     * @return a list of string arrays, a dataset generated from Vina docking log report.
 	 * @throws IOException in case of error in IO operations
 	 */
 	public static List<String[]> generateVinaReportSingle(String entriesPath, String outputPath, String pdb, List<String[]> bindingResults) throws IOException {

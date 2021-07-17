@@ -161,6 +161,7 @@ public class Ligand3D {
 	/**
 	 * A method to remove duplicated ligands from a selected ChEMBL IDs list
 	 * @param similarLigands the OpenBabel-selected ligands list
+	 * @param keepall if true, duplicates will not be removed
 	 * @return a list of string arrays holding the filtered ligands names and IDs 
 	 */
 	public static List<String[]> getLigandsIDsFiltered(List<String[]> similarLigands, boolean keepall) {
@@ -215,6 +216,7 @@ public class Ligand3D {
 	/**
 	 * A wrapper method to extract ChEMBL IDs from the similar ligands and remove duplicates
 	 * @param ligandsPath the OpenBabel-selected ligands folder path
+	 * @param keepall if true, duplicates will not be removed
 	 * @throws IOException in case of error in IO operations
 	 * @throws FileNotFoundException in case file not found
 	 * @return a list of string arrays holding the filtered ligands names and IDs 
@@ -233,6 +235,7 @@ public class Ligand3D {
 	 * A method to combine ligands information with Tanimoto similarity
 	 * @param ligandsPath the OpenBabel-selected ligands folder path
 	 * @param idsFile ligands IDs file
+     * @param keepall if true, duplicates will not be removed
 	 * @throws IOException in case of error in IO operations
 	 * @throws FileNotFoundException in case file not found
 	 * @return a list of string arrays holding the filtered ligands names, IDs and Tanimoto similarity 
@@ -313,6 +316,7 @@ public class Ligand3D {
 	 * A method to combine ligands information with Tanimoto similarity and SMILES
 	 * @param ligandsPath the OpenBabel-selected ligands folder path
 	 * @param idsFile ligands IDs file
+     * @param keepall if true, duplicates will not be removed
 	 * @throws IOException in case of error in IO operations
 	 * @throws FileNotFoundException in case file not found
 	 * @return a list of string arrays holding the filtered ligands names, IDs, Tanimoto similarity and SMILES 

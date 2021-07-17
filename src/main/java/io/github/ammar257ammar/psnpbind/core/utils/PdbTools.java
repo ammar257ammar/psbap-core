@@ -42,6 +42,7 @@ import org.biojava.nbio.structure.io.sifts.SiftsEntity;
 import org.biojava.nbio.structure.io.sifts.SiftsResidue;
 import org.biojava.nbio.structure.io.sifts.SiftsSegment;
 import org.biojava.nbio.structure.io.sifts.SiftsXMLParser;
+import org.openscience.cdk.exception.CDKException;
 
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
@@ -201,6 +202,8 @@ public class PdbTools {
 	 * @param path a string to the input file containing the SIFTS URLs to download
 	 * @param outputFolderPath a string to the output folder where SIFTS file will be downloaded
 	 * @return a String of the download command exit status (success, failure)
+     * @throws IOException  thrown exception
+     * @throws InterruptedException  thrown exception
 	 */
 	public static String downloadSifts(String path, String outputFolderPath) throws IOException, InterruptedException {
 
