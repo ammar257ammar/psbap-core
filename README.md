@@ -1,6 +1,6 @@
 # PSnpBind Core Library
 
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/f88127b901bd40b48b9a3bab4b309703)](https://www.codacy.com/gh/ammar257ammar/psnpbind-core/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ammar257ammar/psnpbind-core&amp;utm_campaign=Badge_Grade) ![GitHub top language](https://img.shields.io/github/languages/top/ammar257ammar/psnpbind-core) ![Lines of code](https://img.shields.io/tokei/lines/github/ammar257ammar/psnpbind-core) ![GitHub](https://img.shields.io/github/license/ammar257ammar/psnpbind-core) ![GitHub release (latest by date)](https://img.shields.io/github/v/release/ammar257ammar/psnpbind-core)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/f88127b901bd40b48b9a3bab4b309703)](https://www.codacy.com/gh/ammar257ammar/psnpbind-core/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ammar257ammar/psnpbind-core&amp;utm_campaign=Badge_Grade) ![GitHub top language](https://img.shields.io/github/languages/top/ammar257ammar/psnpbind-core) ![Lines of code](https://img.shields.io/tokei/lines/github/ammar257ammar/psnpbind-core) ![GitHub](https://img.shields.io/github/license/ammar257ammar/psnpbind-core) ![GitHub release (latest by date)](https://img.shields.io/github/v/release/ammar257ammar/psnpbind-core) ![Docker Image Size (latest by date)](https://img.shields.io/docker/image-size/aammar/psnpbind-core)
 
 PSnpBind core library is the main library for PSnpBind data processing and database construction.
 
