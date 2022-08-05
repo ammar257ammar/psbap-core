@@ -23,18 +23,26 @@ package io.github.ammar257ammar.psnpbind.core.utils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.biojava.nbio.core.util.InputStreamProvider;
 import org.biojava.nbio.structure.AminoAcid;
+import org.biojava.nbio.structure.Calc;
 import org.biojava.nbio.structure.Chain;
 import org.biojava.nbio.structure.Group;
 import org.biojava.nbio.structure.GroupType;
 import org.biojava.nbio.structure.Structure;
+import org.biojava.nbio.structure.StructureException;
 import org.biojava.nbio.structure.align.util.AtomCache;
+import org.biojava.nbio.structure.asa.AsaCalculator;
+import org.biojava.nbio.structure.asa.GroupAsa;
 import org.biojava.nbio.structure.io.FileParsingParameters;
 import org.biojava.nbio.structure.io.LocalPDBDirectory.FetchBehavior;
 import org.biojava.nbio.structure.io.PDBFileReader;
@@ -42,7 +50,9 @@ import org.biojava.nbio.structure.io.sifts.SiftsEntity;
 import org.biojava.nbio.structure.io.sifts.SiftsResidue;
 import org.biojava.nbio.structure.io.sifts.SiftsSegment;
 import org.biojava.nbio.structure.io.sifts.SiftsXMLParser;
-import org.openscience.cdk.exception.CDKException;
+import org.biojava.nbio.structure.secstruc.DSSPParser;
+import org.biojava.nbio.structure.secstruc.SecStrucCalc;
+import org.biojava.nbio.structure.secstruc.SecStrucState;
 
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
@@ -231,5 +241,332 @@ public class PdbTools {
 		return result;
 
 	}
+	
+	public static List<SecStrucState> getDsspForPDB(String path, String pdb) throws IOException, StructureException {
+
+      PDBbindEntry entry = new PDBbindEntry(pdb, false, false);
+      Structure s = entry.getProteinStructure();
+
+      URL url = Paths.get(path).toUri().toURL();
+
+      InputStream in = new GZIPInputStream(url.openStream());
+
+      SecStrucCalc ssp = new SecStrucCalc();
+      try {
+          return ssp.calculate(s, true);
+      } catch (StructureException e) {
+          try {
+              return DSSPParser.parseInputStream(in, s, true);
+          } catch (Exception bige) {
+              System.out.println(bige);
+          }
+      }
+      return null;
+  }
+
+  public static Map<String, Integer> getSecStructFrequencyFromDSSP(List<SecStrucState> dssp) {
+
+      Map<String, Integer> frequencyMap = new HashMap<String, Integer>();
+
+      for (SecStrucState state : dssp) {
+
+          Integer count = frequencyMap.get(state.getType().name);
+          if (count == null)
+              count = 0;
+
+          frequencyMap.put(state.getType().name, count + 1);
+      }
+
+      return frequencyMap;
+  }
+
+  public static Map<String, Double> getSecStructPercentageFromDSSP(List<SecStrucState> dssp) {
+
+      Map<String, Double> frequencyMap = new HashMap<String, Double>();
+
+      for (SecStrucState state : dssp) {
+
+          Double count = frequencyMap.get(state.getType().name);
+          if (count == null)
+              count = 0.0;
+
+          frequencyMap.put(state.getType().name, count + 1.0);
+      }
+
+      for (Map.Entry<String, Double> entry : frequencyMap.entrySet()) {
+          frequencyMap.put(entry.getKey(), entry.getValue() / Double.valueOf(dssp.size()));
+      }
+
+      return frequencyMap;
+  }
+
+  public static Map<String, Integer> getHelixStrandFrequencyFromDSSP(List<SecStrucState> dssp) {
+
+      Map<String, Integer> frequencyMap = new HashMap<String, Integer>();
+
+      frequencyMap.put("Helix", 0);
+      frequencyMap.put("Strand", 0);
+
+      for (SecStrucState state : dssp) {
+
+          if (state.getType().isHelixType()) {
+
+              Integer count = frequencyMap.get("Helix");
+              frequencyMap.put("Helix", count + 1);
+
+          } else if (state.getType().isBetaStrand()) {
+
+              Integer count = frequencyMap.get("Strand");
+              frequencyMap.put("Strand", count + 1);
+          }
+      }
+
+      return frequencyMap;
+  }
+
+  public static Map<String, Double> getHelixStrandPercentageFromDSSP(List<SecStrucState> dssp) {
+
+      Map<String, Double> frequencyMap = new HashMap<String, Double>();
+
+      frequencyMap.put("Helix", 0.0);
+      frequencyMap.put("Strand", 0.0);
+
+      for (SecStrucState state : dssp) {
+
+          if (state.getType().isHelixType()) {
+
+              Double count = frequencyMap.get("Helix");
+              frequencyMap.put("Helix", count + 1.0);
+
+          } else if (state.getType().isBetaStrand()) {
+
+              Double count = frequencyMap.get("Strand");
+              frequencyMap.put("Strand", count + 1.0);
+          }
+      }
+
+      for (Map.Entry<String, Double> entry : frequencyMap.entrySet()) {
+          frequencyMap.put(entry.getKey(), entry.getValue() / Double.valueOf(dssp.size()));
+      }
+
+      return frequencyMap;
+  }
+
+  public static Map<String, Double> getPocketHelixStrandPercentageFromDSSP(List<SecStrucState> dssp, String pdb) {
+
+      Map<String, Double> frequencyMap = new HashMap<String, Double>();
+
+      PDBbindEntry pdbEntry = new PDBbindEntry(pdb, false, false);
+
+      frequencyMap.put("Helix", 0.0);
+      frequencyMap.put("Strand", 0.0);
+      frequencyMap.put("Other", 0.0);
+
+      int pocketRescount = 0;
+
+      for (SecStrucState state : dssp) {
+
+          for (AminoAcid aa : pdbEntry.getProteinAminoAcids()) {
+
+              if (state.getGroup().getResidueNumber().getSeqNum().equals(aa.getResidueNumber().getSeqNum())) {
+
+                  pocketRescount++;
+                  
+                  if (state.getType().isHelixType()) {
+
+                      Double count = frequencyMap.get("Helix");
+                      frequencyMap.put("Helix", count + 1.0);
+
+                  } else if (state.getType().isBetaStrand()) {
+
+                      Double count = frequencyMap.get("Strand");
+                      frequencyMap.put("Strand", count + 1.0);
+
+                  } else {
+                      Double count = frequencyMap.get("Other");
+                      frequencyMap.put("Other", count + 1.0);
+                  }
+
+                  break;
+              }
+          }
+      }
+
+      for (Map.Entry<String, Double> entry : frequencyMap.entrySet()) {
+          frequencyMap.put(entry.getKey(), entry.getValue() / Double.valueOf(pocketRescount));
+      }
+
+      if (frequencyMap.get("Helix") > frequencyMap.get("Strand") && frequencyMap.get("Helix") > frequencyMap.get("Other")){
+
+          frequencyMap.put("Dominant", 1000.0);
+
+      }else if (frequencyMap.get("Strand") > frequencyMap.get("Other")){
+
+          frequencyMap.put("Dominant", 2000.0);
+
+      }else{
+
+          frequencyMap.put("Dominant", 3000.0);
+      }
+
+      return frequencyMap;
+  }
+  
+  public static Map<String, Double> getPocketBuriedExposedASA(String pdb) throws IOException {
+
+      Map<String, Double> frequencyMap = new HashMap<String, Double>();
+
+      PDBbindEntry pdbEntry = new PDBbindEntry(pdb, false, false);
+
+      int buriedCount = 0;
+      int exposedCount = 0;
+      int totalCount = 0;
+
+      AsaCalculator asa = new AsaCalculator(pdbEntry.getProteinStructure(), AsaCalculator.DEFAULT_PROBE_SIZE,
+              AsaCalculator.DEFAULT_N_SPHERE_POINTS, 10, false);
+
+      GroupAsa[] gasa = asa.getGroupAsas();
+
+      double asaValue = 0.0;
+
+      for (GroupAsa d : gasa) {
+
+          for (AminoAcid aa : pdbEntry.getPocketAminoAcids()) {
+
+              if (d.getGroup().getResidueNumber().toString().equals(aa.getResidueNumber().toString())) {
+
+                  totalCount++;
+
+                  asaValue += d.getAsaU();
+
+                  double relativeASA = d.getRelativeAsaU();
+
+                  if (relativeASA < 0.2) {
+                      buriedCount++;
+                  } else {
+                      exposedCount++;
+                  }
+
+                  break;
+              }
+          }
+      }
+
+      frequencyMap.put("Buried", Double.valueOf(buriedCount) / Double.valueOf(totalCount));
+      frequencyMap.put("Exposed", Double.valueOf(exposedCount) / Double.valueOf(totalCount));
+      frequencyMap.put("Ratio", Double.valueOf(buriedCount) / Double.valueOf(exposedCount));
+      frequencyMap.put("PocketASA", asaValue);
+
+      return frequencyMap;
+  }
+
+  public static String getSnpSecStruc(List<SecStrucState> dssp, int snpResidueNumber) {
+
+      String annotation = "";
+      for (SecStrucState state : dssp) {
+
+          if (state.getGroup().getResidueNumber().getSeqNum().equals(snpResidueNumber)) {
+              annotation = state.getType().name;
+          }
+      }
+
+      return annotation;
+  }
+
+  public static String getSnpHelixOrStrand(List<SecStrucState> dssp, int snpResidueNumber) {
+
+      String annotation = "";
+      for (SecStrucState state : dssp) {
+
+          if (state.getGroup().getResidueNumber().getSeqNum().equals(snpResidueNumber)) {
+
+              if (state.getType().isHelixType()) {
+
+                  annotation = "Helix";
+
+              } else if (state.getType().isBetaStrand()) {
+
+                  annotation = "Strand";
+
+              } else {
+                  annotation = "Other";
+              }
+          }
+      }
+
+      return annotation;
+  }
+
+  public static Double getResidueASA(String path, String residueNumber) throws IOException {
+
+      PDBFileReader reader = PdbTools.configureReader(false);
+
+      Structure proteinStructure = reader.getStructure(path);
+
+      AsaCalculator asa = new AsaCalculator(proteinStructure, AsaCalculator.DEFAULT_PROBE_SIZE,
+              AsaCalculator.DEFAULT_N_SPHERE_POINTS, 10, false);
+
+      GroupAsa[] gasa = asa.getGroupAsas();
+
+      double asaValue = 0.0;
+
+      for (GroupAsa d : gasa) {
+
+          if (d.getGroup().getResidueNumber().toString().equals(residueNumber)) {
+
+              asaValue = d.getRelativeAsaU();
+              break;
+          }
+      }
+
+      return asaValue;
+  }
+
+  public static Pair<Double, Double> getResiduePhiPsi(String path, String residueNumber)
+          throws IOException, StructureException {
+
+      PDBFileReader reader = PdbTools.configureReader(false);
+
+      Structure proteinStructure = reader.getStructure(path);
+
+      List<AminoAcid> aminoAcids = PdbTools.getAminoAcidsFromStructure(proteinStructure);
+
+      double phi = 360.0;
+      double psi = 360.0;
+
+      AminoAcid a = null;
+      AminoAcid b = null;
+      AminoAcid c = null;
+
+      for (int i = 0; i < aminoAcids.size(); i++) {
+
+          if (aminoAcids.get(i).getResidueNumber().toString().equals(residueNumber)) {
+
+              b = aminoAcids.get(i);
+
+              if (i > 0) {
+                  a = aminoAcids.get(i - 1);
+                  try {
+                      phi = Calc.getPhi(a, b);
+                  } catch (StructureException e) {
+                      e.printStackTrace();
+                      phi = 360.0;
+                  }
+              }
+              if (i < aminoAcids.size() - 1) {
+                  c = aminoAcids.get(i + 1);
+                  try {
+                      psi = Calc.getPsi(b, c);
+                  } catch (StructureException e) {
+                      e.printStackTrace();
+                      psi = 360.0;
+                  }
+              }
+              break;
+          }
+      }
+
+      return Pair.of(phi, psi);
+  }
 
 }
