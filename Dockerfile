@@ -9,7 +9,7 @@ COPY src/ ./src/
 RUN mvn package 
 
 
-FROM ubuntu:bionic-20191029
+FROM ubuntu:21.04
 
 LABEL maintainer "Ammar Ammar <ammar257ammar@gmail.com>"
 
