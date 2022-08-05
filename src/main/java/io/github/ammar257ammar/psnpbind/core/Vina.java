@@ -503,7 +503,7 @@ public class Vina {
 			new File(outputPath).mkdir();
 		}
 		
-		File vinaFolder = new File("/processing/vina-docking");
+		File vinaFolder = new File("/pipeline/processing/vina-docking");
 		
 		File[] pdbs = vinaFolder.listFiles();
 		
@@ -542,7 +542,7 @@ public class Vina {
 			entriesPath += "/";
 		}
 		
-		//List<String[]> bindingResults = new ArrayList<String[]>();
+		List<String[]> bindingResultsSingle = new ArrayList<String[]>();
 		List<String[]> bindingResultsDf = new ArrayList<String[]>();
 		
 		List<String> bindingResultsDfHeader = new ArrayList<String>();
@@ -609,6 +609,7 @@ public class Vina {
 							
 							if(conformers.size() > 0){
 								bindingResults.add(new String[] {pdb, molVarFolder.getName(), molLigand.getName(), String.join(";", conformers)});
+								bindingResultsSingle.add(new String[] {pdb, molVarFolder.getName(), molLigand.getName(), conformers.get(0).split(":")[1].trim()});
 								varLine.add(bindingAffinity);
 							}
 							
@@ -636,7 +637,7 @@ public class Vina {
 
 		bindingResultsDf.add(0, bindingResultsDfHeader.toArray(new String[bindingResultsDfHeader.size()]));
 		
-		//DataHandler.writeDatasetToTSV(bindingResults, outputPath+".tsv");
+		DataHandler.writeDatasetToTSV(bindingResultsSingle, outputPath+".tsv");
 		DataHandler.writeDatasetToTSV(bindingResultsDf, outputPath+"_df.tsv");
 		
 		return bindingResults;
