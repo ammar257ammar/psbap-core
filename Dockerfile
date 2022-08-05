@@ -9,7 +9,7 @@ COPY src/ ./src/
 RUN mvn package 
 
 
-FROM ubuntu:21.04
+FROM ubuntu:22.04
 
 LABEL maintainer "Ammar Ammar <ammar257ammar@gmail.com>"
 
